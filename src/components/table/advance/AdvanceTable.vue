@@ -2,11 +2,13 @@
   <div ref="table" :id="id" class="advanced-table">
     <a-spin :spinning="loading">
     <div :class="['header-bar', size]">
-      <div v-if="title" class="title">
-        <template >{{title}}</template>
+      <div class="title">
+        <template v-if="title">{{title}}</template>
+        <slot v-else-if="$slots.title" name="title"></slot>
+        <template v-else>高级表格</template>
       </div>
       <div class="search">
-        <search-area :format-conditions="formatConditions" @change="onSearchChange" :searchConfig="searchConfig" >
+        <search-area :format-conditions="formatConditions" @change="onSearchChange" :columns="columns" >
           <template :slot="slot" v-for="slot in slots">
             <slot :name="slot"></slot>
           </template>
@@ -17,15 +19,21 @@
           <a-icon @click="refresh" class="action" :type="loading ? 'loading' : 'reload'" />
         </a-tooltip>
         <action-size v-model="sSize" class="action" />
+        <a-tooltip title="列配置">
+          <action-columns :columns="columns" @reset="onColumnsReset" class="action">
+            <template :slot="slot" v-for="slot in slots">
+              <slot :name="slot"></slot>
+            </template>
+          </action-columns>
+        </a-tooltip>
         <a-tooltip title="全屏">
           <a-icon @click="toggleScreen" class="action" :type="fullScreen ? 'fullscreen-exit' : 'fullscreen'" />
         </a-tooltip>
       </div>
     </div>
     <a-table
-      v-bind="{...$options.propsData, title: undefined, loading: false}"
+      v-bind="{...$props, columns: visibleColumns, title: undefined, loading: false}"
       :size="sSize"
-      :scroll="{ x: '100%', y: 680}"
       @expandedRowsChange="onExpandedRowsChange"
       @change="onChange"
       @expand="onExpand"
@@ -46,16 +54,16 @@
 
 <script>
   import ActionSize from '@/components/table/advance/ActionSize'
+  import ActionColumns from '@/components/table/advance/ActionColumns'
   import SearchArea from '@/components/table/advance/SearchArea'
   export default {
     name: 'AdvanceTable',
-    components: {SearchArea, ActionSize},
+    components: {SearchArea, ActionColumns, ActionSize},
     props: {
       tableLayout: String,
       bordered: Boolean,
-      childrenColumnName: Array[String],
+      childrenColumnName: {type: String, default: 'children'},
       columns: Array,
-      searchConfig: Array,
       components: Object,
       dataSource: Array,
       defaultExpandAllRows: Array[String],
@@ -68,12 +76,12 @@
       indentSize: Number,
       loading: Boolean,
       locale: Object,
-      pagination: Object,
+      pagination: [Object, Boolean],
       rowClassName: Function,
       rowKey: [String, Function],
       rowSelection: Object,
       scroll: Object,
-      showHeader: Boolean,
+      showHeader: {type: Boolean, default: true},
       size: String,
       title: String,
       customHeaderRow: Function,
@@ -101,10 +109,12 @@
       },
       scopedSlots() {
         return Object.keys(this.$scopedSlots).filter(slot => slot !== 'expandedRowRender' && slot !== 'title')
+      },
+      visibleColumns(){
+        return this.columns.filter(col => col.visible)
       }
     },
     created() {
-      console.log('this.$options--->', this.$options)
       this.addListener()
     },
     beforeDestroy() {
@@ -192,16 +202,14 @@
 
 <style scoped lang="less">
 .advanced-table{
-  /*overflow-y: auto;*/
+  overflow-y: auto;
   background-color: @component-background;
   .header-bar{
-    padding: 16px 0;
+    padding: 16px 24px;
     display: flex;
     align-items: center;
     border-radius: 4px;
     transition: all 0.3s;
-    justify-content: space-between;
-    flex-wrap: wrap;
     &.middle{
       padding: 12px 16px;
     }
@@ -220,9 +228,9 @@
       font-weight: 700;
     }
     .search{
-      /*flex: 1;*/
-      /*text-align: right;
-      margin: 0 24px;*/
+      flex: 1;
+      text-align: right;
+      margin: 0 24px;
     }
     .actions{
       text-align: right;

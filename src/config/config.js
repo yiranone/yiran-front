@@ -3,15 +3,10 @@ module.exports = {
   theme: {
     color: '#13c2c2',
     mode: 'dark',
-    success: '#52c41a',
-    warning: '#faad14',
-    error: '#f5222d'
   },
   multiPage: true,
-  asyncRoutes: true,
-  hideSetting: true,
   animate: {
-    name: 'slide',
+    name: 'lightSpeed',
     direction: 'left'
   }
 }

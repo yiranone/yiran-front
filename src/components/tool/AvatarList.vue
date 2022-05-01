@@ -6,8 +6,8 @@
 </template>
 
 <script>
-import AAvatar from 'ant-design-vue/lib/avatar/Avatar'
-import ATooltip from 'ant-design-vue/lib/tooltip/Tooltip'
+import AAvatar from 'ant-design-vue/es/avatar/Avatar'
+import ATooltip from 'ant-design-vue/es/tooltip/Tooltip'
 const Item = {
   name: 'AvatarListItem',
   props: {
@@ -35,7 +35,7 @@ const Item = {
     return h(
       'li',
       {class: 'avatar-item'},
-      [!this.$props.tips ? h(ATooltip, {props: {title: this.$props.tips}}, [avatar]) : avatar]
+      [this.$props.tips ? h(ATooltip, {props: {title: this.$props.tips}}, [avatar]) : avatar]
     )
   }
 }

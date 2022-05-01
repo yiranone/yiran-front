@@ -5,7 +5,7 @@ import {parseUrlParams} from '@/utils/request'
 const current = new Date().getTime()
 
 const goodsList = Mock.mock({
-  'list|5': [{
+  'list|100': [{
     'id|+1': 0,
     'name': '@GOODS',
     'orderId': `${current}-@integer(1,100)`,
@@ -17,8 +17,8 @@ const goodsList = Mock.mock({
   }]
 })
 
-Mock.mock('/api/ext/deposit/lis','post', ({url}) => {
-  /*const params = parseUrlParams(decodeURI(url))
+Mock.mock(RegExp(`${process.env.VUE_APP_API_BASE_URL}/goods` + '.*'),'get', ({url}) => {
+  const params = parseUrlParams(decodeURI(url))
   let {page, pageSize} = params
   page = eval(page) - 1 || 0
   pageSize = eval(pageSize) || 10
@@ -37,16 +37,70 @@ Mock.mock('/api/ext/deposit/lis','post', ({url}) => {
     result = []
   } else {
     result = result.slice(page * pageSize, (page + 1) * pageSize)
-  }*/
+  }
   return {
-    code: 200,
+    code: 0,
     message: 'success',
     data: {
-      /*page: page + 1,
-      pageSize,*/
-      pageNum: 1,
-      total: 5,
-      list: goodsList.list
+      page: page + 1,
+      pageSize,
+      total,
+      list: result
     }
   }
+})
+
+const columnsConfig = [
+  {
+    title: '商品名称',
+    dataIndex: 'name',
+    searchAble: true
+  },
+  {
+    title: '订单号',
+    dataIndex: 'orderId'
+  },
+  {
+    searchAble: true,
+    dataIndex: 'status',
+    dataType: 'select',
+    slots: {title: 'statusTitle'},
+    scopedSlots: {customRender: 'status'},
+    search: {
+      selectOptions: [
+        {title: '已下单', value: 1},
+        {title: '已付款', value: 2},
+        {title: '已审核', value: 3},
+        // {title: '已发货', value: 4}
+      ]
+    }
+  },
+  {
+    title: '发货',
+    searchAble: true,
+    dataIndex: 'send',
+    dataType: 'boolean',
+    scopedSlots: {customRender: 'send'}
+  },
+  {
+    title: '发货时间',
+    dataIndex: 'sendTime',
+    dataType: 'datetime'
+  },
+  {
+    title: '下单日期',
+    searchAble: true,
+    dataIndex: 'orderDate',
+    dataType: 'date',
+    visible: false
+  },
+  {
+    title: '审核时间',
+    dataIndex: 'auditTime',
+    dataType: 'time',
+  },
+]
+
+Mock.mock(`${process.env.VUE_APP_API_BASE_URL}/columns`, 'get', () => {
+  return columnsConfig
 })

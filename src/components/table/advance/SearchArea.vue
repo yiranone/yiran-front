@@ -1,13 +1,16 @@
 <template>
   <div class="search-area" ref="root">
     <div class="select-root" ref="selectRoot"></div>
-    <div class="search-item" :key="index" v-for="(col, index) in searchConfig">
+    <div class="search-item" :key="index" v-for="(col, index) in searchCols">
       <div v-if="col.dataType === 'boolean'" :class="['title', {active: col.search.value !== undefined}]">
         <template v-if="col.title">
           {{col.title}}:
         </template>
         <slot v-else-if="col.slots && col.slots.title" :name="col.slots.title"></slot>
-        <a-switch @change="onSwitchChange(col)" class="switch" v-model="col.search.value" size="small" checked-children="是" un-checked-children="否" />
+        <a-switch @change="onSwitchChange(col)" class="switch" v-model="col.search.value" size="small"
+                  :checked-children="(col.search.switchOptions && col.search.switchOptions.checkedText) || '是'"
+                  :un-checked-children="(col.search.switchOptions && col.search.switchOptions.uncheckedText) || '否'"
+        />
         <a-icon v-if="col.search.value !== undefined" class="close" @click="e => onCloseClick(e, col)" type="close-circle" theme="filled" />
       </div>
       <div v-else-if="col.dataType === 'time'" :class="['title', {active: col.search.value}]">
@@ -36,7 +39,7 @@
           {{col.title}}:
         </template>
         <slot v-else-if="col.slots && col.slots.title" :name="col.slots.title"></slot>
-        <a-select :dropdownMatchSelectWidth="false" :allowClear="col.search.clearIcon" :options="col.search.selectOptions" v-model="col.search.value" placeholder="请选择..." @change="onSelectChange(col)" class="select" slot="content" size="small" :get-popup-container="() => $refs.selectRoot">
+        <a-select :allowClear="true" :options="col.search.selectOptions" v-model="col.search.value" placeholder="请选择..." @change="onSelectChange(col)" class="select" slot="content" size="small" :get-popup-container="() => $refs.selectRoot">
         </a-select>
       </div>
       <div v-else :class="['title', {active: col.search.value}]">
@@ -62,17 +65,33 @@
 </template>
 
 <script>
+  import fastEqual from 'fast-deep-equal'
   import moment from 'moment'
 
   export default {
     name: 'SearchArea',
-    props: ['searchConfig', 'formatConditions'],
+    props: ['columns', 'formatConditions'],
     inject: ['table'],
     created() {
-      this.searchConfig.forEach(item => {
-        this.$set(item, 'search', {visible: false, value: undefined, format: this.getFormat(item), ...item.search})
-      })
-      console.log('searchConfig---->',this.searchConfig)
+      this.formatColumns(this.columns)
+    },
+    watch: {
+      columns(newVal, oldVal) {
+        if (newVal != oldVal) {
+          this.formatColumns(newVal)
+        }
+      },
+      searchCols(newVal, oldVal) {
+        if (newVal.length != oldVal.length) {
+          const newConditions = this.getConditions(newVal)
+          const newSearchOptions = this.getSearchOptions(newVal)
+          if (!fastEqual(newConditions, this.conditions)) {
+            this.conditions = newConditions
+            this.searchOptions = newSearchOptions
+            this.$emit('change', this.conditions, this.searchOptions)
+          }
+        }
+      }
     },
     data() {
       return {
@@ -81,6 +100,9 @@
       }
     },
     computed: {
+      searchCols() {
+        return this.columns.filter(item => item.searchAble)
+      },
       searchIdPrefix() {
         return this.table.id + '-ipt-'
       }
@@ -152,15 +174,16 @@
       backupAndEmitChange(col, backValue = col.search.value) {
         const {getConditions, getSearchOptions} = this
         col.search.backup = backValue
-        this.conditions = getConditions(this.searchConfig)
-        this.searchOptions = getSearchOptions(this.searchConfig)
+        this.conditions = getConditions(this.searchCols)
+        this.searchOptions = getSearchOptions(this.searchCols)
         this.$emit('change', this.conditions, this.searchOptions)
       },
       getConditions(columns) {
         const conditions = {}
-        columns.forEach(col => {
+        columns.filter(item => item.search.value !== undefined && item.search.value !== '' && item.search.value !== null)
+          .forEach(col => {
             const {value, format} = col.search
-            if (value !== undefined && value !== '' && value !== null && this.formatConditions && format) {
+            if (this.formatConditions && format) {
               if (typeof format === 'function') {
                 conditions[col.dataIndex] = format(col.search.value)
               } else if (typeof format === 'string' && value.constructor.name === 'Moment') {
@@ -200,6 +223,11 @@
           return true
         }
         return false
+      },
+      formatColumns(columns) {
+        columns.forEach(item => {
+          this.$set(item, 'search', {...item.search, visible: false, value: undefined, format: this.getFormat(item)})
+        })
       }
     }
   }
@@ -210,9 +238,6 @@
   .select-root{
     text-align: left;
   }
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   margin: -4px 0;
   .search-item{
     margin: 4px 4px;
@@ -273,7 +298,7 @@
   }
   .select{
     margin-left: 4px;
-    max-width: 200px;
+    max-width: 144px;
     min-width: 96px;
     text-align: left;
   }

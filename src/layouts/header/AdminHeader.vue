@@ -5,14 +5,19 @@
         <img width="32" src="@/assets/img/logo.png" />
         <h1 v-if="!isMobile">{{systemName}}</h1>
       </router-link>
-      <!--<a-divider v-if="isMobile" type="vertical" />-->
-      <a-icon v-if="layout !== 'head' && !isMobile" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse"/>
+      <a-divider v-if="isMobile" type="vertical" />
+      <a-icon v-if="layout !== 'head'" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse"/>
       <div v-if="layout !== 'side' && !isMobile" class="admin-header-menu" :style="`width: ${menuWidth};`">
         <i-menu class="head-menu" :theme="headerTheme" mode="horizontal" :options="menuData" @select="onSelect"/>
       </div>
       <div :class="['admin-header-right', headerTheme]">
-          <!--<header-notice class="header-item"/>-->
-          <screen-full class="header-item"/>
+          <header-search class="header-item" @active="val => searchActive = val" />
+          <a-tooltip class="header-item" title="帮助文档" placement="bottom" >
+            <a href="https://iczer.gitee.io/vue-antd-admin-docs/" target="_blank">
+              <a-icon type="question-circle-o" />
+            </a>
+          </a-tooltip>
+          <header-notice class="header-item"/>
           <header-avatar class="header-item"/>
           <a-dropdown class="lang header-item">
             <div>
@@ -31,13 +36,12 @@
 import HeaderSearch from './HeaderSearch'
 import HeaderNotice from './HeaderNotice'
 import HeaderAvatar from './HeaderAvatar'
-import ScreenFull from './ScreenFull'
 import IMenu from '@/components/menu/menu'
 import {mapState, mapMutations} from 'vuex'
 
 export default {
   name: 'AdminHeader',
-  components: {IMenu, HeaderAvatar, ScreenFull},
+  components: {IMenu, HeaderAvatar, HeaderNotice, HeaderSearch},
   props: ['collapsed', 'menuData'],
   data() {
     return {

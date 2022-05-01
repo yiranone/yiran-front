@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import ACol from 'ant-design-vue/lib/grid/Col'
+import ACol from 'ant-design-vue/es/grid/Col'
 const Item = {
   name: 'DetailListItem',
   props: {

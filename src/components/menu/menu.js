@@ -132,31 +132,31 @@ export default {
     },
     renderMenuItem: function (h, menu) {
       return h(
-        Item, {key: menu.fullPath},
-        [
-          h('router-link', {props: {to: menu.fullPath}, attrs: {style: 'overflow:hidden;white-space:normal;text-overflow:clip;'}},
-            [
-              this.renderIcon(h, menu.meta ? menu.meta.icon : 'none', menu.fullPath),
-              this.$t(getI18nKey(menu.fullPath))
-            ]
-          )
-        ]
+          Item, {key: menu.fullPath},
+          [
+            h('router-link', {props: {to: menu.fullPath}, attrs: {style: 'overflow:hidden;white-space:normal;text-overflow:clip;'}},
+                [
+                  this.renderIcon(h, menu.meta ? menu.meta.icon : 'none', menu.fullPath),
+                  this.$t(getI18nKey(menu.fullPath))
+                ]
+            )
+          ]
       )
     },
     renderSubMenu: function (h, menu) {
       let this_ = this
       let subItem = [h('span', {slot: 'title', attrs: {style: 'overflow:hidden;white-space:normal;text-overflow:clip;'}},
-        [
-          this.renderIcon(h, menu.meta ? menu.meta.icon : 'none', menu.fullPath),
-          this.$t(getI18nKey(menu.fullPath))
-        ]
+          [
+            this.renderIcon(h, menu.meta ? menu.meta.icon : 'none', menu.fullPath),
+            this.$t(getI18nKey(menu.fullPath))
+          ]
       )]
       let itemArr = []
       menu.children.forEach(function (item) {
         itemArr.push(this_.renderItem(h, item))
       })
       return h(SubMenu, {key: menu.fullPath},
-        subItem.concat(itemArr)
+          subItem.concat(itemArr)
       )
     },
     renderItem: function (h, menu) {
@@ -207,24 +207,24 @@ export default {
   },
   render (h) {
     return h(
-      Menu,
-      {
-        props: {
-          theme: this.menuTheme,
-          mode: this.$props.mode,
-          selectedKeys: this.selectedKeys,
-          openKeys: this.openKeys ? this.openKeys : this.sOpenKeys
-        },
-        on: {
-          'update:openKeys': (val) => {
-            this.sOpenKeys = val
+        Menu,
+        {
+          props: {
+            theme: this.menuTheme,
+            mode: this.$props.mode,
+            selectedKeys: this.selectedKeys,
+            openKeys: this.openKeys ? this.openKeys : this.sOpenKeys
           },
-          click: (obj) => {
-            obj.selectedKeys = [obj.key]
-            this.$emit('select', obj)
+          on: {
+            'update:openKeys': (val) => {
+              this.sOpenKeys = val
+            },
+            click: (obj) => {
+              obj.selectedKeys = [obj.key]
+              this.$emit('select', obj)
+            }
           }
-        }
-      }, this.renderMenu(h, this.options)
+        }, this.renderMenu(h, this.options)
     )
   }
 }

@@ -60,10 +60,10 @@ export default {
     this.updatePageHeight(0)
   },
   computed: {
-    ...mapState('setting', ['layout', 'multiPage', 'pageMinHeight', 'pageWidth']),
+    ...mapState('setting', ['layout', 'multiPage', 'pageMinHeight', 'pageWidth', 'customTitles']),
     pageTitle() {
       let pageTitle = this.page && this.page.title
-      return pageTitle === undefined ? (this.title || this.routeName) : this.$t(pageTitle)
+      return this.customTitle || (pageTitle && this.$t(pageTitle)) || this.title || this.routeName
     },
     routeName() {
       const route = this.$route
@@ -111,8 +111,7 @@ export default {
 
 <style lang="less">
   .page-header{
-    /*<!--margin: 0 -24px 0;-->*/
-    margin: 0;
+    margin: 0 -24px 0;
   }
   .link{
     /*margin-top: 16px;*/
@@ -128,8 +127,7 @@ export default {
   }
   .page-content{
     position: relative;
-    /*padding: 24px 0 0;*/
-    padding: 12px 0 0;
+    padding: 24px 0 0;
     &.side{
     }
     &.head.fixed{

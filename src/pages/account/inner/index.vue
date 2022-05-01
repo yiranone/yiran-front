@@ -30,19 +30,19 @@
         <template slot="action" slot-scope="{record}">
           <a-spin :spinning="loadingBalanceId === record.balanceId">
             <a-icon slot="indicator" type="loading" spin />
-            <div class="flex">
-              <a-link type="primary" style="margin-right: 10px" @click="handleAction(record, 'rechange')">充币</a-link>
-              <a-link type="primary" @click="handleAction(record, 'withdraw')">提币</a-link>
-            </div>
+            <a style="margin-right: 8px" @click="handleAction(record, 'rechange')">
+              <a-icon type="plus"/>充币
+            </a>
+            <a @click="handleAction(record, 'withdraw')">
+              <a-icon type="delete" />提币
+            </a>
             <div class="flex">
               <a-link type="primary" style="margin-right: 10px" @click="handleAction(record, 'gather')">归集</a-link>
               <a-link type="primary" @click="handleAction(record, 'createCode')">创建兑换码</a-link>
             </div>
-            <div class="flex">
               <a @click="refreshRecord(record)">
                 <a-icon type="reload" />刷新
               </a>
-            </div>
           </a-spin>
         </template>
       </standard-table>

@@ -1,8 +1,7 @@
 <template>
   <page-layout title="重要公告">
     <div slot="headerContent">
-      <p>ETH或者ERC20交易一直广播中，解决办法</p>
-      <p>建议用户使用 【get_eth_gasprice】接口获取以太坊网络Gas价格</p>
+      <p>汇总内部账户余额</p>
     </div>
     <template slot="action"><a href="#">查看更多</a></template>
     <div style="padding: 0 10px 20px 10px;background: #ffffff">
@@ -48,7 +47,7 @@
   import websocket from '../../utils/websocket'
   import {mapState} from 'vuex'
   export default {
-    name: "Home",
+    name: "Home1",
     i18n: require('./i18n'),
     components: {PageLayout, CoinInfo, RechangeModal, GatherModal, WithdrawModal, SetPayPwd, CreateCode},
     data() {

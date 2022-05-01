@@ -1,7 +1,7 @@
 <template>
   <div class="standard-table">
     <div class="alert">
-      <!--<a-alert type="info" :show-icon="true" v-if="selectedRows">
+      <a-alert type="info" :show-icon="true" v-if="selectedRows">
         <div class="message" slot="message">
           已选择&nbsp;<a>{{selectedRows.length}}</a>&nbsp;项 <a class="clear" @click="onClear">清空</a>
           <template  v-for="(item, index) in needTotalList" >
@@ -11,7 +11,7 @@
             </div>
           </template>
         </div>
-      </a-alert>-->
+      </a-alert>
     </div>
     <a-table
       :bordered="bordered"
@@ -98,7 +98,7 @@ export default {
     },
     onChange(pagination, filters, sorter, {currentDataSource}) {
       this.$emit('change', pagination, filters, sorter, {currentDataSource})
-    },
+    }
   },
   created () {
     this.needTotalList = this.initTotalList(this.columns)
@@ -109,7 +109,14 @@ export default {
         return {
           ...item,
           total: selectedRows.reduce((sum, val) => {
-            return sum + val[item.dataIndex]
+            let v
+            try{
+              v = val[item.dataIndex] ? val[item.dataIndex] : eval(`val.${item.dataIndex}`);
+            }catch(_){
+              v = val[item.dataIndex];
+            }
+            v = !isNaN(parseFloat(v)) ? parseFloat(v) : 0;
+            return sum + v
           }, 0)
         }
       })
@@ -121,7 +128,7 @@ export default {
         return (typeof this.rowKey === 'function') ? this.rowKey(record) : record[this.rowKey]
       })
     }
-  },
+  }
 }
 </script>
 
