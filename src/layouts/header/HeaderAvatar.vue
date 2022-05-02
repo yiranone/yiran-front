@@ -5,11 +5,11 @@
       <span class="name">{{user.name}}</span>
     </div>
     <a-menu :class="['avatar-menu']" slot="overlay">
-      <a-menu-item>
+      <a-menu-item @click="$router.push('/percenter')">
         <a-icon type="user" />
         <span>个人中心</span>
       </a-menu-item>
-      <a-menu-item>
+      <a-menu-item @click="$router.push('/percenter')">
         <a-icon type="setting" />
         <span>设置</span>
       </a-menu-item>
@@ -24,7 +24,7 @@
 
 <script>
 import {mapGetters} from 'vuex'
-import {logout} from '@/services/user'
+import {userService as us} from '@/services/index'
 
 export default {
   name: 'HeaderAvatar',
@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     logout() {
-      logout()
+      us.logout()
       this.$router.push('/login')
     }
   }
