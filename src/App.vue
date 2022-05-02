@@ -24,7 +24,7 @@
     },
     mounted() {
       this.setWeekModeTheme(this.weekMode)
-      this.getWebsocketInfo()
+      // this.getWebsocketInfo()
     },
     beforeDestroy() {
       this.closeWebsocket()
@@ -53,7 +53,7 @@
     },
     methods: {
       ...mapMutations('setting', ['setDevice']),
-      ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
+      // ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
       setWeekModeTheme(weekMode) {
         if (weekMode) {
           document.body.classList.add('week-mode')

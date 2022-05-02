@@ -77,58 +77,6 @@ const routerMap = {
     name: '权限管理',
     path: '/perm',
     component: () => import('@/pages/system/perm')
-  },
-  exchange: {
-    name: '兑换码管理',
-    path: '/exchange',
-    component: () => import('@/pages/exchange')
-  },
-  /*交易管理*/
-  transaction: {
-    name: '交易管理',
-    icon: 'transaction',
-    component: view.blank
-  },
-  recharge: {
-    name: '充值记录',
-    path: '/recharge',
-    component: () => import('@/pages/transaction/recharge'),
-  },
-  withdraw: {
-    name: '取现记录',
-    path: '/withdraw',
-    component: () => import('@/pages/transaction/withdraw'),
-  },
-  userDeposit: {
-    name: '用户充值',
-    path: '/userDeposit',
-    component: () => import('@/pages/transaction/userDeposit'),
-  },
-  userWithdraw: {
-    name: '用户提现',
-    path: '/userWithdraw',
-    component: () => import('@/pages/transaction/userWithdraw'),
-  },
-  hashQuery: {
-    name: 'hash查询',
-    path: '/hashQuery',
-    component: () => import('@/pages/transaction/hashQuery'),
-  },
-  /*账户管理*/
-  account: {
-    name: '账户管理',
-    icon: 'account-book',
-    component: view.blank
-  },
-  inner: {
-    name: '内部账户',
-    path: '/inner',
-    component: () => import('@/pages/account/inner'),
-  },
-  external: {
-    name: '外部账户',
-    path: '/external',
-    component: () => import('@/pages/account/external'),
-  },
+  }
 }
 export default routerMap

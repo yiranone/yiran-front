@@ -9,7 +9,7 @@ export default {
     roles: null,
     routesConfig: null,
     innerAccountList: [],
-    websocket: new Websocket()
+    // websocket: new Websocket()
   },
   getters: {
     user: state => {
@@ -82,25 +82,25 @@ export default {
     }
   },
   actions: {
-    getWebsocketInfo({state}) {
-      state.websocket.createWebSocket({
-        url: WITHDRAW_NOTICE_URI,
-        onmessage: (res) => {
-          console.log(res)
-          for (let i = 0; i < state.innerAccountList.length; i++) {
-            if (state.innerAccountList[i].balanceId == res.data.balanceId) {
-              state.innerAccountList[i] = {...state.innerAccountList[i], ...res.data}
-              break
-            }
-          }
-          state.innerAccountList = [...state.innerAccountList]
-        }
-      })
-    },
-
-    closeWebsocket({state}) {
-      if (!state.websocket.websock) return;
-      state.websocket.websock.close()
-    }
+    // getWebsocketInfo({state}) {
+    //   state.websocket.createWebSocket({
+    //     url: WITHDRAW_NOTICE_URI,
+    //     onmessage: (res) => {
+    //       console.log(res)
+    //       for (let i = 0; i < state.innerAccountList.length; i++) {
+    //         if (state.innerAccountList[i].balanceId == res.data.balanceId) {
+    //           state.innerAccountList[i] = {...state.innerAccountList[i], ...res.data}
+    //           break
+    //         }
+    //       }
+    //       state.innerAccountList = [...state.innerAccountList]
+    //     }
+    //   })
+    // },
+    //
+    // closeWebsocket({state}) {
+    //   if (!state.websocket.websock) return;
+    //   state.websocket.websock.close()
+    // }
   }
 }

@@ -2,10 +2,10 @@
   <a-dropdown>
     <div class="header-avatar" style="cursor: pointer">
       <a-avatar class="avatar" size="small" shape="circle" :src="user.avatar"/>
-      <span class="name">{{user.userName}}</span>
+      <span class="name">{{user.name}}</span>
     </div>
     <a-menu :class="['avatar-menu']" slot="overlay">
-      <a-menu-item @click="$router.push('/percenter')">
+      <a-menu-item>
         <a-icon type="user" />
         <span>个人中心</span>
       </a-menu-item>
@@ -24,7 +24,7 @@
 
 <script>
 import {mapGetters} from 'vuex'
-import {userService as us} from '../../services'
+import {logout} from '@/services/user'
 
 export default {
   name: 'HeaderAvatar',
@@ -33,7 +33,7 @@ export default {
   },
   methods: {
     logout() {
-      us.logout()
+      logout()
       this.$router.push('/login')
     }
   }

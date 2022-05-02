@@ -106,7 +106,7 @@
     },
     methods: {
       ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
-      ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
+      // ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
       onSubmit(e) {
         e.preventDefault()
         this.form.validateFields(async (err) => {
@@ -132,7 +132,7 @@
         // 获取路由配置
         this.$message.success(Mock.mock('@TIMEFIX').CN + '，欢迎回来', 3)
         loadRoutes({router: this.$router, store: this.$store, i18n: this.$i18n})
-        this.getWebsocketInfo()
+        // this.getWebsocketInfo()
         this.$router.push('/home')
       }
     }

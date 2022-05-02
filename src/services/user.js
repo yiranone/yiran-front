@@ -30,59 +30,6 @@ const user = {
   },
 
   /*=====================================================================
-                                币-交易模块
-  ======================================================================*/
-  /*归集全部*/
-  gatherAllMoney(params) {
-    return request(API.GATHER_ALL_MONEY_URI, METHOD.POST, params)
-  },
-
-  /*归集全部*/
-  autoCollect(params) {
-    return request(API.SET_AUTO_COLLECT_URI, METHOD.POST, params)
-  },
-
-  /*刷新内部账户余额状态*/
-  refreshInnerStatics(params) {
-    return request(API.REFRESH_INNER_STATICS_URI, METHOD.POST, params)
-  },
-
-  /*刷新外部账户余额状态*/
-  refreshExternalStatics(params) {
-    return request(API.REFRESH_EXTERNAL_STATICS_URI, METHOD.POST, params)
-  },
-
-  /*txnId刷新交易结果*/
-  refreshTransactionByTxnId(params) {
-    return request(API.REFRESH_TRANSACTION_BY_TXNID_URI, METHOD.POST, params)
-  },
-
-  /*txnId重新发送http通知*/
-  resendNoticeByTxnId(params) {
-    return request(API.RESEND_NOTICE_BY_TXNID_URI, METHOD.POST, params)
-  },
-
-  /*提现-设置密码*/
-  resetPassword(params) {
-    return request(API.SYS_RESET_PASSWORD_URI, METHOD.POST, params)
-  },
-
-  /*提现-申请*/
-  withdrawApply(params) {
-    return request(API.WITHDRAW_APPLY_URI, METHOD.POST, params)
-  },
-
-  /*提现-发送短信*/
-  sendSms(params) {
-    return request(API.SEND_SMS_URI, METHOD.POST, params)
-  },
-
-  /*设置在首页展示*/
-  isShowOnHomePage(params) {
-    return request(API.SET_SHOW_ON_HOME_PAGE_URI, METHOD.POST, params)
-  },
-
-  /*=====================================================================
                               菜单管理模块
   ======================================================================*/
   /*删除用户*/
@@ -139,30 +86,6 @@ const user = {
     return request(type === '新增'? API.PERM_ADD_URI : API.PERM_EDIT_URI, METHOD.POST, params)
   },
 
-  /*=====================================================================
-                              兑换码管理模块
-  ======================================================================*/
-  /*删除兑换码*/
-  deleteExchange(params) {
-    return request(API.EXCHANGE_REMOVE_URI, METHOD.POST, params)
-  },
-
-  /*兑换码导出*/
-  exportExchange(params) {
-    return request(API.EXCHANGE_EXPORT_URI, METHOD.POST, params)
-  },
-
-  /*生产兑换码*/
-  generateExchange(params) {
-    return request(API.GENERATE_EXPORT_URI, METHOD.POST, params)
-  },
-
-  /*生产兑下载*/
-  downloadExchange(params) {
-    // return request(API.GENERATE_DOWNLOAD_URI, METHOD.GET, params)
-    window.open(`${params.fileName}`)
-    // window.location.href = `api/${API.GENERATE_DOWNLOAD_URI}?fileName=${params.fileName}&delete=true`
-  },
 }
 
 export default user
