@@ -27,7 +27,7 @@
       // this.getWebsocketInfo()
     },
     beforeDestroy() {
-      this.closeWebsocket()
+      // this.closeWebsocket()
     },
     watch: {
       weekMode(val) {

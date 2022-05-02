@@ -102,7 +102,7 @@
     },
 
     mounted() {
-      this.closeWebsocket()
+      // this.closeWebsocket()
     },
     methods: {
       ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),

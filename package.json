@@ -1,7 +1,7 @@
 {
-  "name": "vue-antd-admin",
+  "name": "vue-antd-admin-yiran",
   "version": "0.7.4",
-  "homepage": "https://iczer.github.io/vue-antd-admin",
+  "homepage": "https://yiran.muggleminer.com",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
