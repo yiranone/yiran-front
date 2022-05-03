@@ -6,7 +6,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "dev": "webpack serve --open --inline --progress --config vue.conf.js",
+    "dev": "vue-cli-service serve --open --inline --progress --config vue.conf.js",
     "lint": "vue-cli-service lint",
     "predeploy": "yarn build",
     "deploy": "gh-pages -d dist -b pages -r https://gitee.com/iczer/vue-antd-admin.git",

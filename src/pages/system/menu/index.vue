@@ -78,7 +78,7 @@
       dataIndex: 'orderNum',
       sorter: true,
       align: 'center',
-      width: 100
+      width: 40
     }, {
       title: '路由标识',
       dataIndex: 'router',
