@@ -60,6 +60,7 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
   // 如果 routesConfig 有值，则更新到本地，否则从本地获取
   if (!routesConfig && checkAuthorization()) {
     await us.getRoutesConfig().then(res => {
+      console.info("后台应答目录:" + JSON.stringify(res))
       routesConfig =[{
         router: 'root',
         children: [{

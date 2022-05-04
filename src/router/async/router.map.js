@@ -60,22 +60,22 @@ const routerMap = {
   },
   menu: {
     name: '菜单管理',
-    path: '/menu',
+    path: 'menu', //相对路径，url会自动加上父菜单的路径
     component: () => import('@/pages/system/menu')
   },
   role: {
     name: '角色管理',
-    path: '/role',
+    path: 'role',
     component: () => import('@/pages/system/role')
   },
   user: {
     name: '用户管理',
-    path: '/user',
+    path: 'user',
     component: () => import('@/pages/system/user')
   },
   perm: {
     name: '权限管理',
-    path: '/perm',
+    path: 'perm',
     component: () => import('@/pages/system/perm')
   }
 }

@@ -92,9 +92,11 @@ export default {
       let routes = this.$route.matched
       const path = this.$route.path
       let breadcrumb = []
-      routes.filter(item => path.includes(item.path))
+      //debugger
+      // routes.filter(item => path.includes(item.path))
+      routes
         .forEach(route => {
-        const path = route.path.length === 0 ? '/home' : route.path
+        const path = route.path.length === 0 ? '/current' : route.path
         breadcrumb.push(this.$t(getI18nKey(path)))
       })
       let pageTitle = this.page && this.page.title

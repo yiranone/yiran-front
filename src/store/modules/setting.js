@@ -85,6 +85,7 @@ export default {
       state.pageMinHeight += minHeight
     },
     setMenuData(state, menuData) {
+      console.info("设置目录:" + JSON.stringify(menuData))
       state.menuData = menuData
     },
     setAsyncRoutes(state, asyncRoutes) {
