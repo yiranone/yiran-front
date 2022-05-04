@@ -49,6 +49,70 @@ function parseRoutes(routesConfig, routerMap) {
   return routes
 }
 
+function parseRoutes2(routesConfig, routerMap) {
+  let routes = []
+  routesConfig.forEach(item => {
+    // 获取注册在 routerMap 中的 router，初始化 routeCfg
+    let router = undefined, routeCfg = {}
+    if (typeof item === 'string' && routerMap[item]) {
+      router = routerMap[item]
+      routeCfg = {path: router.path || item, router: item}
+    } else if (typeof item === 'object') {
+      router = routerMap[item.router]
+      routeCfg = item
+    }
+
+    if (router == undefined)
+      router = {}
+
+    const route = {
+      path: routeCfg.path || router.path || routeCfg.router,
+      name: routeCfg.name || router.name,
+      component: router.component,
+      redirect: routeCfg.redirect || router.redirect,
+      meta: {
+        authority: routeCfg.authority || router.authority || '*',
+        icon: routeCfg.icon || router.icon,
+        page: routeCfg.page || router.page
+      }
+    }
+    if (routeCfg.invisible || router.invisible) {
+      route.meta.invisible = true
+    }
+    if (routeCfg.children && routeCfg.children.length > 0) {
+      route.children = parseRoutes2(routeCfg.children, routerMap)
+    }
+    if(route.path == null) {
+      console.info("菜单name=[" + route.name + "]的path没有设置，不显示")
+    } else {
+      routes.push(route)
+    }
+  })
+  return routes
+}
+
+function filterNoChildFolder(routes) {
+  //校验合法性
+  let checkRoutes = []
+  routes.forEach(item => {
+    let ok = true
+    if (item != null) {
+      if(item.children == null || item.children.length == 0 && item.component != null) {
+        ok = false
+      }
+    }
+    if(ok) {
+      checkRoutes.push(item)
+      if (routes.children && routes.children.length > 0) {
+        route.children = filterNoChildFolder(routes)
+      }
+    } else {
+      console.info("["+ item.name + "]菜单没有子菜单，不展示")
+    }
+  })
+  return checkRoutes
+}
+
 /**
  * 加载路由
  * @param router 应用路由实例
@@ -60,7 +124,6 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
   // 如果 routesConfig 有值，则更新到本地，否则从本地获取
   if (!routesConfig && checkAuthorization()) {
     await us.getRoutesConfig().then(res => {
-      console.info("后台应答目录:" + JSON.stringify(res))
       routesConfig =[{
         router: 'root',
         children: [{
@@ -68,12 +131,14 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
         }, ...res]
       }]
     })
+    console.info("后台应答目录:" + JSON.stringify(routesConfig))
   }
   // 如果开启了异步路由，则加载异步路由配置
   const asyncRoutes = store.state.setting.asyncRoutes
   if (asyncRoutes) {
     if (routesConfig && routesConfig.length > 0) {
-      const routes = parseRoutes(routesConfig, routerMap)
+      let routes = parseRoutes2(routesConfig, routerMap)
+      routes = filterNoChildFolder(routes)
       formatRoutes(routes)
       const finalRoutes = mergeRoutes(router.options.routes, routes)
       router.options = {...router.options, routes: finalRoutes}

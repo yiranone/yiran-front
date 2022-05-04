@@ -6,7 +6,7 @@
     <a-card :id="id">
       <div class="flex space-between">
         <div>
-          <a-button type="primary" @click="addRecord" style="margin-right: 5px">
+          <a-button type="primary" @click="addRecord({'menuId':'0'})" style="margin-right: 5px">
             <a-icon type="plus"/>
             新增
           </a-button>
@@ -82,12 +82,17 @@
     }, {
       title: '路由标识',
       dataIndex: 'router',
-      align: 'center',
+      align: 'left',
       width: 100
+    }, {
+      title: '类型',
+      dataIndex: 'menuType',
+      align: 'left',
+      width: 40
     }, {
       title: '权限字符',
       dataIndex: 'perms',
-      align: 'center',
+      align: 'left',
       width: 100
     }, {
       title: '更新时间',
@@ -129,21 +134,6 @@
 
     authorize: {
       deleteRecord: 'delete'
-    },
-
-    filters: {
-      statusStr(val) {
-        switch (val) {
-          case 'CONFIRMED':
-            return '已完成'
-          case 'NEW':
-            return '新建'
-          case 3:
-            return '已审核'
-          case 4:
-            return '已发货'
-        }
-      }
     },
 
     created() {
@@ -188,7 +178,10 @@
       addRecord(record) {
         this.formType = '新增'
         this.menuInfo = {
-          parentId: record && record.menuId
+          parentId: record == null ? '0' : record.menuId,
+          menuType: "M",
+          orderNum : 1,
+          visible : "0",
         }
         this.formVisible = true
       },

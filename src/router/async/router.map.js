@@ -52,6 +52,11 @@ const routerMap = {
     icon: 'home',
     component: () => import('@/pages/home')
   },
+  system2: {
+    name: '系统管理2',
+    icon: 'setting',
+    component: view.blank
+  },
   /*系统管理*/
   system: {
     name: '系统管理',
