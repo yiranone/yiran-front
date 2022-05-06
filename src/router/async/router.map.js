@@ -9,23 +9,27 @@ const view = {
 const routerMap = {
   login: {
     authority: '*',
-    path: '/login',
+    path: 'login',
+    invisible: true,
     component: () => import('@/pages/login')
   },
   exp403: {
     authority: '*',
     name: 'exp403',
     path: '403',
+    invisible: true,
     component: () => import('@/pages/exception/403')
   },
   exp404: {
     name: 'exp404',
     path: '404',
+    invisible: true,
     component: () => import('@/pages/exception/404')
   },
   exp500: {
     name: 'exp500',
     path: '500',
+    invisible: true,
     component: () => import('@/pages/exception/500')
   },
 /*  person: {
@@ -36,33 +40,34 @@ const routerMap = {
   percenter: {
     authority: '*',
     name: '个人中心',
-    path: '/percenter',
-    invisible: true,
+    path: 'percenter',
+    invisible: true, //这个导航在菜单不可见
     component: () => import('@/pages/personCenter')
   },
   root: {
     path: '/',
     name: '当前位置',
     redirect: '/home',
+    invisible: true,
     component: view.tabs
   },
   home: {
     name: '首页',
-    path: '/home',
+    path: 'home',
     icon: 'home',
     component: () => import('@/pages/home')
   },
-  system2: {
+  /*系统管理*/
+/*  system2: {
     name: '系统管理2',
     icon: 'setting',
     component: view.blank
-  },
-  /*系统管理*/
-  system: {
+  },*/
+/*  system: {
     name: '系统管理',
     icon: 'setting',
     component: view.blank
-  },
+  },*/
   menu: {
     name: '菜单管理',
     path: 'menu', //相对路径，url会自动加上父菜单的路径

@@ -10,7 +10,7 @@ import {checkAuthorization} from "./request";
  * @param routesConfig 路由配置
  * @param routerMap 本地路由组件注册配置
  */
-function parseRoutes(routesConfig, routerMap) {
+/*function parseRoutes(routesConfig, routerMap) {
   let routes = []
   routesConfig.forEach(item => {
     // 获取注册在 routerMap 中的 router，初始化 routeCfg
@@ -47,9 +47,9 @@ function parseRoutes(routesConfig, routerMap) {
     }
   })
   return routes
-}
+}*/
 
-function parseRoutes2(routesConfig, routerMap) {
+function parseRoutes(routesConfig, routerMap) {
   let routes = []
   routesConfig.forEach(item => {
     // 获取注册在 routerMap 中的 router，初始化 routeCfg
@@ -68,23 +68,28 @@ function parseRoutes2(routesConfig, routerMap) {
     const route = {
       path: routeCfg.path || router.path || routeCfg.router,
       name: routeCfg.name || router.name,
-      component: router.component,
+      menuType: routeCfg.menuType,
+      component: routeCfg.component || router.component,
       redirect: routeCfg.redirect || router.redirect,
       meta: {
         authority: routeCfg.authority || router.authority || '*',
         icon: routeCfg.icon || router.icon,
-        page: routeCfg.page || router.page
+        page: routeCfg.page || router.page,
       }
     }
-    if (routeCfg.invisible || router.invisible) {
+    if (routeCfg.invisible || router.invisible || (routeCfg.meta && routeCfg.meta.invisible)) {
       route.meta.invisible = true
     }
     if (routeCfg.children && routeCfg.children.length > 0) {
-      route.children = parseRoutes2(routeCfg.children, routerMap)
+      route.children = parseRoutes(routeCfg.children, routerMap)
+    }
+    if (item.menuType == 'M') { //如果是目录，给空的视图
+      route.component = () => import('@/layouts/BlankView')
     }
     if(route.path == null) {
       console.info("菜单name=[" + route.name + "]的path没有设置，不显示")
     } else {
+      //console.info("菜单>>" + JSON.stringify(route))
       routes.push(route)
     }
   })
@@ -92,25 +97,20 @@ function parseRoutes2(routesConfig, routerMap) {
 }
 
 function filterNoChildFolder(routes) {
-  //校验合法性
-  let checkRoutes = []
-  routes.forEach(item => {
-    let ok = true
-    if (item != null) {
-      if(item.children == null || item.children.length == 0 && item.component != null) {
-        ok = false
-      }
+  //如果是目录，子节点为空，不展示
+  for (let index = 0; index < routes.length; index++) {
+    let item = routes[index];
+    if (item.children && item.children.length > 0) {
+      filterNoChildFolder(item.children)
     }
-    if(ok) {
-      checkRoutes.push(item)
-      if (routes.children && routes.children.length > 0) {
-        route.children = filterNoChildFolder(routes)
-      }
+    if((item.children == null || item.children.length == 0) &&
+        (item.menuType == 'M')) {
+      console.info("过滤空菜单:" + item.name)
+      routes.splice(index, 1);
+      index--
     } else {
-      console.info("["+ item.name + "]菜单没有子菜单，不展示")
     }
-  })
-  return checkRoutes
+  }
 }
 
 /**
@@ -131,14 +131,21 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
         }, ...res]
       }]
     })
+
+    // routesConfig =[{
+    //       router: 'root',
+    //       children: [{
+    //         router: 'percenter'
+    //       }, ...router.options.routes]
+    //     }]
     console.info("后台应答目录:" + JSON.stringify(routesConfig))
   }
   // 如果开启了异步路由，则加载异步路由配置
   const asyncRoutes = store.state.setting.asyncRoutes
   if (asyncRoutes) {
     if (routesConfig && routesConfig.length > 0) {
-      let routes = parseRoutes2(routesConfig, routerMap)
-      routes = filterNoChildFolder(routes)
+      let routes = parseRoutes(routesConfig, routerMap)
+      filterNoChildFolder(routes)
       formatRoutes(routes)
       const finalRoutes = mergeRoutes(router.options.routes, routes)
       router.options = {...router.options, routes: finalRoutes}
