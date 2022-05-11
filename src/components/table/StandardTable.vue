@@ -1,6 +1,6 @@
 <template>
   <div class="standard-table">
-    <div class="alert">
+    <div class="alert" v-if="showSelectInfo">
       <a-alert type="info" :show-icon="true" v-if="selectedRows">
         <div class="message" slot="message">
           已选择&nbsp;<a>{{selectedRows.length}}</a>&nbsp;项 <a class="clear" @click="onClear">清空</a>
@@ -44,6 +44,10 @@
 export default {
   name: 'StandardTable',
   props: {
+    showSelectInfo: {
+      type: [Boolean],
+      default: false
+    },
     bordered: Boolean,
     loading: [Boolean, Object],
     columns: Array,

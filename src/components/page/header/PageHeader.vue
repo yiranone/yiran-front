@@ -11,7 +11,7 @@
       <div class="detail">
         <div class="main">
           <div class="row">
-            <h1 v-if="showPageTitle && title" class="title">{{title}}</h1>
+            <h1 v-if="showPageTitle && title" class="title">{{title}} {{showPageTitle}}</h1>
             <div class="action"><slot name="action"></slot></div>
           </div>
           <div class="row">

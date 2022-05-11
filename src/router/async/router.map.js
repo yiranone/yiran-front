@@ -87,6 +87,11 @@ const routerMap = {
     name: '权限管理',
     path: 'perm',
     component: () => import('@/pages/system/perm')
+  },
+  channel: {
+    name: '渠道管理',
+    path: 'channel',
+    component: () => import('@/pages/system/channel')
   }
 }
 export default routerMap

@@ -23,4 +23,9 @@ module.exports = {
   PERM_REMOVE_URI: 'system/perm/remove', // 权限删除
   PERM_ADD_URI: 'system/perm/add', // 权限新增
   PERM_EDIT_URI: 'system/perm/edit', // 权限编辑
+  /*===渠道管理===*/
+  CHANNEL_LIST_URI: 'system/channel/list',
+  CHANNEL_REMOVE_URI: 'system/channel/remove',
+  CHANNEL_ADD_URI: 'system/channel/add',
+  CHANNEL_EDIT_URI: 'system/channel/edit',
 }
