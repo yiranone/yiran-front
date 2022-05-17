@@ -279,18 +279,7 @@
 
       mFormSuccess(res) {
         this.formVisible = false
-        if (this.formType == '新增') {
-          /*this.dataSource = [res, ...this.dataSource]
-          this.total++*/
-          this.onRefresh()
-        } else {
-          this.dataSource = this.dataSource.map(item => {
-            if (item.roleId == res.roleId) {
-              item = {...res}
-            }
-            return item
-          })
-        }
+        this.onRefresh()
       }
     }
   }

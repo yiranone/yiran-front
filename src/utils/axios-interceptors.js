@@ -1,4 +1,5 @@
 import Cookie from 'js-cookie'
+import {removeAuthorization} from "@/utils/request";
 // 401拦截
 const resp401 = {
   /**
@@ -50,6 +51,13 @@ const respCommon = {
     if (res.code === 200) {
       // message.error('无此接口权限')
       return res.data
+    } else if (res.code === 401) {
+      // 用户没有登陆
+      // options.router.options.routes.push({path: '/login'})
+      //this.push({path: '/login'})
+      removeAuthorization() //用户没有登陆，删除token
+      message.warn(res.msg)
+      return Promise.reject(res)
     } else {
       message.warn(res.msg)
       return Promise.reject(res)
