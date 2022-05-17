@@ -5,31 +5,31 @@
         <a-form layout="horizontal" @submit="onSubmit" :form="form">
           <div :class="expand ? null: 'fold'">
             <a-row>
-              <a-col :md="8" :sm="24">
+              <a-col :xl="8" :md="24">
                 <a-form-item
                     label="渠道名称"
-                    :labelCol="{span: 5}"
-                    :wrapperCol="{span: 18, offset: 0}"
+                    :labelCol="{span: 6}"
+                    :wrapperCol="{span: 17, offset: 0}"
                 >
                   <a-input allowClear
                            placeholder="请输入渠道名称"
                            v-decorator="['searchChannelName']"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :xl="8" :md="24">
                 <a-form-item
                     label="渠道编码"
-                    :labelCol="{span: 5}"
-                    :wrapperCol="{span: 18, offset: 0}"
+                    :labelCol="{span: 6}"
+                    :wrapperCol="{span: 17, offset: 0}"
                 >
                   <a-input allowClear placeholder="" v-decorator="['searchChannelCode']"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :xl="8" :sm="24">
                 <a-form-item
                     label="状态"
-                    :labelCol="{span: 5}"
-                    :wrapperCol="{span: 18, offset: 0}"
+                    :labelCol="{span: 6}"
+                    :wrapperCol="{span: 17, offset: 0}"
                 >
                   <a-select allowClear placeholder="请选择" v-decorator="['searchStatus']">
                     <a-select-option value="0">正常</a-select-option>
@@ -39,20 +39,20 @@
               </a-col>
             </a-row>
             <a-row v-if="expand">
-              <a-col :md="8" :sm="24">
+              <a-col :xl="8" :sm="24">
                 <a-form-item
                     label="到期时间大于"
-                    :labelCol="{span: 5}"
-                    :wrapperCol="{span: 18, offset: 0}"
+                    :labelCol="{span: 6}"
+                    :wrapperCol="{span: 17, offset: 0}"
                 >
                   <a-date-picker style="width: 100%" placeholder="" v-decorator="['searchExpireDate1']"/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col :xl="8" :sm="24">
                 <a-form-item
                     label="到期时间小于"
-                    :labelCol="{span: 5}"
-                    :wrapperCol="{span: 18, offset: 0}"
+                    :labelCol="{span: 6}"
+                    :wrapperCol="{span: 17, offset: 0}"
                 >
                   <a-date-picker style="width: 100%" placeholder="" v-decorator="['searchExpireDate2']"/>
                 </a-form-item>
