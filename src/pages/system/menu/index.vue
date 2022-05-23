@@ -82,45 +82,45 @@ const columns = [
   {
     title: '菜单名称',
     dataIndex: 'menuName',
-    width: 150
+    width: 220
   }, {
     title: '图标',
     dataIndex: 'icon',
     align: 'center',
     scopedSlots: {customRender: 'icon'},
-    width: 50
+    width: 100
   }, {
     title: '排序',
     dataIndex: 'orderNum',
     sorter: true,
     align: 'center',
-    width: 40
+    width: 100
   }, {
     title: '路由标识',
     dataIndex: 'router',
     align: 'left',
-    width: 100
+    width: 120
   }, {
     title: '类型',
     dataIndex: 'menuType',
     align: 'left',
-    width: 40
+    width: 60
   }, {
     title: '权限字符',
     dataIndex: 'perms',
     align: 'left',
-    width: 100
+    width: 200
   }, {
     title: '更新时间',
     dataIndex: 'updateTime',
     align: 'center',
     sorter: true,
-    width: 100,
+    width: 200,
   }, {
     title: '操作',
     scopedSlots: {customRender: 'action'},
     align: 'right',
-    width: 220,
+    width: 200
   }
 ]
 
