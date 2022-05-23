@@ -18,12 +18,10 @@
             批量删除
           </a-button>
         </div>
-        <type-set :colSize="colSize" @changeSize="changeSize" :elId="id" @refresh="onRefresh"/>
       </div>
       <standard-table
           :columns="columns"
           :dataSource="dataSource"
-          :col-size="colSize"
           rowKey="userId"
           :loading="loading"
           :pagination="{
@@ -80,7 +78,6 @@
 <script>
   import PageLayout from '@/layouts/PageLayout'
   import StandardTable from '@/components/table/StandardTable'
-  import TypeSet from '../../common/type-set'
   import MForm from './m-form'
   import {dataSource as ds,userService as us} from '../../../services/index'
 
@@ -117,7 +114,7 @@
       dataIndex: 'updateTime',
       align: 'center',
       sorter: true,
-      width: 100,
+      width: 180,
       scopedSlots: {customRender: 'time'}
     }, {
       title: '修改人',
@@ -128,17 +125,16 @@
       title: '操作',
       scopedSlots: {customRender: 'action'},
       align: 'center',
-      width: 220,
+      width: 180,
     }
   ]
 
   export default {
-    components: {PageLayout, StandardTable, TypeSet, MForm},
+    components: {PageLayout, StandardTable, MForm},
     data() {
       return {
         id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
         loading: false,
-        colSize: 'middle',
         columns: columns,
         dataSource: [],
         conditions: {}, //查询条件

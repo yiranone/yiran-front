@@ -17,12 +17,10 @@
             批量删除
           </a-button>
         </div>
-        <type-set :colSize="colSize" @changeSize="changeSize" :elId="id" @refresh="onRefresh"/>
       </div>
       <standard-table
           :columns="columns"
           :dataSource="dataSource"
-          :col-size="colSize"
           rowKey="permId"
           :loading="loading"
           :pagination="{
@@ -77,7 +75,6 @@
 <script>
   import PageLayout from '@/layouts/PageLayout'
   import StandardTable from '../../../components/table/StandardTable'
-  import TypeSet from '../../common/type-set'
   import MForm from './m-form'
   import {dataSource as ds} from '../../../services/index'
   import {userService as us} from '../../../services/index'
@@ -132,12 +129,11 @@
   ]
 
   export default {
-    components: {PageLayout, StandardTable, TypeSet, MForm},
+    components: {PageLayout, StandardTable, MForm},
     data() {
       return {
         id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
         loading: false,
-        colSize: 'middle',
         columns: columns,
         dataSource: [],
         conditions: {}, //查询条件
@@ -236,11 +232,6 @@
       onSelectChange(selectedRowKeys, selectedRows) {
         this.delets = [...selectedRowKeys]
         console.log(this.delets)
-      },
-
-      /*列表行高改变*/
-      changeSize(key) {
-        this.colSize = key
       },
 
       /*新增*/
