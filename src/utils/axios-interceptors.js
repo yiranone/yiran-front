@@ -1,6 +1,6 @@
 import Cookie from 'js-cookie'
 import {removeAuthorization} from "@/utils/request";
-import {router} from '@/router'
+import {loginIgnore, router} from '@/router'
 // 401拦截
 const resp401 = {
   /**
@@ -51,12 +51,17 @@ const respCommon = {
     let res = response.data
     if (res.code === 200) {
       // message.error('无此接口权限')
+      // console.info(router)
+      // console.info(router.currentRoute.path)
       return res.data
     } else if (res.code === 401) {
       // 用户没有登陆
-      router.push({ path: '/login' })
+      const currentPath = router.currentRoute.path;
+      if("/login" != currentPath) { //当前页面不是登陆页面，跳转到登陆页面
+        router.push({ path: '/login' })
+        message.warn(res.msg)
+      }
       //removeAuthorization() //用户没有登陆，删除token
-      message.warn(res.msg)
       return Promise.reject(res)
     } else {
       message.warn(res.msg)
