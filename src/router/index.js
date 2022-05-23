@@ -27,4 +27,7 @@ function initRouter() {
   formatRoutes(options.routes)
   return new Router(options)
 }
-export {loginIgnore, initRouter}
+
+const router = initRouter();
+
+export {loginIgnore, router}

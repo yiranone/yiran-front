@@ -1,5 +1,6 @@
 import Cookie from 'js-cookie'
 import {removeAuthorization} from "@/utils/request";
+import {router} from '@/router'
 // 401拦截
 const resp401 = {
   /**
@@ -53,9 +54,8 @@ const respCommon = {
       return res.data
     } else if (res.code === 401) {
       // 用户没有登陆
-      // options.router.options.routes.push({path: '/login'})
-      //this.push({path: '/login'})
-      removeAuthorization() //用户没有登陆，删除token
+      router.push({ path: '/login' })
+      //removeAuthorization() //用户没有登陆，删除token
       message.warn(res.msg)
       return Promise.reject(res)
     } else {

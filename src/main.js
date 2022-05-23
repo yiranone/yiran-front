@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
-import {initRouter} from './router'
+import {router} from '@/router'
 import './theme/index.less'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css';
@@ -17,7 +17,7 @@ import aLink from '@/components/a-link'
 
 if (process.env.NODE_ENV === 'development') require('@/mock');
 
-const router = initRouter()
+// const router = initRouter()
 console.info("前端初始化目录:" + JSON.stringify(router.options.routes))
 
 const i18n = initI18n('CN', 'US')
