@@ -17,7 +17,7 @@ import aLink from '@/components/a-link'
 
 if (process.env.NODE_ENV === 'development') require('@/mock');
 
-const router = initRouter(store.state.setting.asyncRoutes)
+const router = initRouter()
 console.info("前端初始化目录:" + JSON.stringify(router.options.routes))
 
 const i18n = initI18n('CN', 'US')

@@ -1,4 +1,4 @@
-import routerMap from '../router/async/router.map'
+import routerMap from '../router/router.map'
 import {mergeI18nFromRoutes} from '@/utils/i18n'
 import Router from 'vue-router'
 import deepMerge from 'deepmerge'
