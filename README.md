@@ -1,4 +1,4 @@
-# plipalapay-admin
+# muggle-admin
 
 ## Project setup
 ```
