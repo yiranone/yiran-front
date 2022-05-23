@@ -163,7 +163,7 @@
                 </a-popconfirm>
               </a-menu-item>
             </a-menu>
-            <a class="">
+            <a class="" style="white-space: nowrap">
               更多操作 <a-icon type="down" />
             </a>
           </a-dropdown>
@@ -236,7 +236,8 @@ const columns = [
   }, {
     title: '操作',
     scopedSlots: {customRender: 'action'},
-    align: 'center'
+    align: 'center',
+    width: 200
   }
 ]
 
