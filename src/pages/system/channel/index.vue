@@ -101,7 +101,6 @@
           :col-size="colSize"
           rowKey="channelId"
           :loading="loading"
-          :scroll="{ x: '100%'}"
           :pagination="{
             current: pageNum,
             pageSize: pageSize,

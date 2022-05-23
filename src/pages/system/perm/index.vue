@@ -1,7 +1,6 @@
 <template>
   <page-layout title=" ">
     <div slot="headerContent">
-      <query :conditions="conditions" @onQuery="onQuery" :loading="loading"/>
     </div>
     <a-card :id="id">
       <div class="flex space-between">
@@ -26,7 +25,6 @@
           :col-size="colSize"
           rowKey="permId"
           :loading="loading"
-          :scroll="{ x: '100%'}"
           :pagination="{
             current: pageNum,
             pageSize: pageSize,
@@ -78,7 +76,6 @@
 
 <script>
   import PageLayout from '@/layouts/PageLayout'
-  import Query from './query'
   import StandardTable from '../../../components/table/StandardTable'
   import TypeSet from '../../common/type-set'
   import MForm from './m-form'
@@ -135,7 +132,7 @@
   ]
 
   export default {
-    components: {PageLayout, Query, StandardTable, TypeSet, MForm},
+    components: {PageLayout, StandardTable, TypeSet, MForm},
     data() {
       return {
         id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,

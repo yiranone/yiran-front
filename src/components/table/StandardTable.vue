@@ -14,18 +14,16 @@
       </a-alert>
     </div>
     <a-table
-      :bordered="bordered"
-      :loading="loading"
-      :columns="columns"
-      :dataSource="dataSource"
-      :rowKey="rowKey"
-      :pagination="pagination"
-      :expandedRowKeys="expandedRowKeys"
-      :expandedRowRender="expandedRowRender"
-      :scroll="scroll"
-      :size="colSize"
-      @change="onChange"
-      :rowSelection="selectedRows ? {selectedRowKeys: selectedRowKeys, onChange: updateSelect, getCheckboxProps: getCheckboxProps} : undefined"
+        :bordered="bordered"
+        :loading="loading"
+        :columns="columns"
+        :dataSource="dataSource"
+        :rowKey="rowKey"
+        :pagination="pagination"
+        :expandedRowKeys="expandedRowKeys"
+        :expandedRowRender="expandedRowRender"
+        @change="onChange"
+        :rowSelection="selectedRows ? {selectedRowKeys: selectedRowKeys, onChange: updateSelect} : undefined"
     >
       <template slot-scope="text, record, index" :slot="slot" v-for="slot in Object.keys($scopedSlots).filter(key => key !== 'expandedRowRender') ">
         <slot :name="slot" v-bind="{text, record, index}"></slot>
@@ -60,21 +58,9 @@ export default {
       type: [Object, Boolean],
       default: true
     },
-    scroll: {
-      type: [Object, Boolean],
-      default: false
-    },
-    colSize: {
-      type: String,
-      default: 'middle'
-    },
     selectedRows: Array,
     expandedRowKeys: Array,
-    expandedRowRender: Function,
-    getCheckboxProps: {
-      type: Function,
-      default: () => (record) => ({})
-    }
+    expandedRowRender: Function
   },
   data () {
     return {
@@ -88,12 +74,12 @@ export default {
     },
     initTotalList (columns) {
       const totalList = columns.filter(item => item.needTotal)
-        .map(item => {
-          return {
-            ...item,
-            total: 0
-          }
-        })
+          .map(item => {
+            return {
+              ...item,
+              total: 0
+            }
+          })
       return totalList
     },
     onClear() {
