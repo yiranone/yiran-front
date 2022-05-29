@@ -3,6 +3,60 @@
     <div slot="headerContent">
     </div>
     <a-card :id="id">
+      <div class="search">
+        <a-form layout="horizontal" @submit="onSubmit" :form="form">
+          <a-row>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                  label="用户ID"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 0}"
+              >
+                <a-input allowClear
+                         placeholder=""
+                         v-decorator="['userId']"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                  label="用户名称"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 0}"
+              >
+                <a-input allowClear
+                         placeholder=""
+                         v-decorator="['userName']"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                  label="手机号"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 0}"
+              >
+                <a-input allowClear
+                         placeholder=""
+                         v-decorator="['phoneNumber']"/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item
+                  label="部门"
+                  :labelCol="{span: 5}"
+                  :wrapperCol="{span: 18, offset: 0}"
+              >
+                <a-input allowClear
+                         placeholder=""
+                         v-decorator="['deptName']"/>
+              </a-form-item>
+            </a-col>
+            <a-col style="margin-top: 3px" :md="8" :sm="24">
+              <a-button type="primary" htmlType="submit">查询</a-button>
+              <a-button style="margin-left: 8px" @click="onReset">重置</a-button>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
       <div class="flex space-between">
         <div>
           <a-button type="primary" @click="addRecord" style="margin-right: 5px">
@@ -104,6 +158,12 @@
       align: 'center',
       width: 100
     }, {
+      title: '部门',
+      dataIndex: 'deptName',
+      sorter: true,
+      align: 'center',
+      width: 100
+    }, {
       title: '状态',
       dataIndex: 'status',
       align: 'center',
@@ -143,6 +203,7 @@
         pageNum: 1,
         formVisible: false,
         formType: '新增',
+        form: this.$form.createForm(this),
         formMenuType: 'M',
         initialValue: {},
         selectedRows: [],
@@ -234,6 +295,22 @@
         this.getList()
       },
 
+      onSubmit(e) {
+        e.preventDefault()
+        this.form.validateFields((err) => {
+          if (!err) {
+            this.conditions = this.form.getFieldsValue()
+            this.onQuery()
+          }
+        })
+      },
+
+      onReset() {
+        this.form.resetFields();
+        this.conditions = {};
+        this.onQuery();
+      },
+
       /*选中行改变触发*/
       onSelectChange(selectedRowKeys, selectedRows) {
         this.delets = [...selectedRowKeys]
@@ -253,14 +330,27 @@
       /*编辑*/
       editRecord(record) {
         this.formType = '编辑'
-        this.initialValue = {...record}
-        this.formVisible = true
+        us.detailUser({userId: record.userId}).then(res => {
+          this.initialValue = {...res}
+          this.formVisible = true
+
+        }).catch(res => {
+          console.info("用户编辑失败" + res)
+        })
       },
 
       /*重置密码*/
       resetPwd(record) {
         this.formType = '重置'
         this.initialValue = {...record}
+        us.deleteUser({ids: delets}).then(res => {
+          this.$message.success('删除成功')
+          this.dataSource = this.dataSource.filter(item => {
+            return !this.delets.includes(item.roleId)
+          })
+          this.total = this.total - this.delets.length
+        }).catch(res => {
+        })
         this.formVisible = true
       },
 
@@ -298,16 +388,3 @@
     }
   }
 </script>
-
-<style lang="less" scoped>
-  /deep/ .page-header .page-header-wide .detail .main .content {
-    width: 100%;
-    > div {
-      width: 100%;
-    }
-  }
-
-  /deep/ .ant-tag {
-    margin-right: 0;
-  }
-</style>

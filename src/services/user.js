@@ -45,6 +45,10 @@ const user = {
   /*=====================================================================
                                 用户管理模块
   ======================================================================*/
+  /*查询用户*/
+  detailUser(params) {
+    return request(API.USER_DETAIL_URI, METHOD.POST, params)
+  },
   /*删除用户*/
   deleteUser(params) {
     return request(API.USER_REMOVE_URI, METHOD.POST, params)

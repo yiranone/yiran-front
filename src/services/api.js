@@ -8,6 +8,7 @@ module.exports = {
   MENU_ADD_URI: 'system/menu/add', // 新增菜单
   MENU_EDIT_URI: 'system/menu/edit', // 编辑菜单
   /*===用户管理===*/
+  USER_DETAIL_URI: 'system/user/detail', // 用户列表
   USER_LIST_URI: 'system/user/list', // 用户列表
   USER_REMOVE_URI: 'system/user/remove', // 用户删除
   USER_ADD_URI: 'system/user/add', // 用户新增
