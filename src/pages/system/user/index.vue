@@ -178,7 +178,7 @@
       scopedSlots: {customRender: 'time'}
     }, {
       title: '修改人',
-      dataIndex: 'createBy',
+      dataIndex: 'updateBy',
       align: 'center',
       width: 80
     }, {
@@ -333,7 +333,6 @@
         us.detailUser({userId: record.userId}).then(res => {
           this.initialValue = {...res}
           this.formVisible = true
-
         }).catch(res => {
           console.info("用户编辑失败" + res)
         })
@@ -373,17 +372,7 @@
 
       mFormSuccess(res) {
         this.formVisible = false
-        if (this.formType == '新增') {
-          this.dataSource = [res, ...this.dataSource]
-          this.total++
-        } else {
-          this.dataSource = this.dataSource.map(item => {
-            if (item.userId == res.userId) {
-              item = {...res}
-            }
-            return item
-          })
-        }
+        this.getList()
       }
     }
   }
