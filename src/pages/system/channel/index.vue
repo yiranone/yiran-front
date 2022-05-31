@@ -193,6 +193,7 @@ const columns = [
   }, {
     title: '渠道名称',
     dataIndex: 'channelName',
+    sorter: true,
     width: 100
   }, {
     title: '渠道编码',
