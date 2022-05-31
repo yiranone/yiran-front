@@ -269,11 +269,6 @@
           this.roleList = rows
         })
       },
-      /*查询*/
-      onQuery(conditions) {
-        this.conditions = {...this.conditions, ...conditions}
-        this.getList()
-      },
 
       /*表格搜索条件改变查询*/
       onChange(pagination, filters, sorter, {currentDataSource}) {
@@ -287,28 +282,22 @@
         this.getList()
       },
 
-      /*type刷新*/
-      onRefresh() {
-        this.pageNum = 1
-        this.conditions = {}
-        this.pageSize = 10
-        this.getList()
-      },
-
       onSubmit(e) {
         e.preventDefault()
         this.form.validateFields((err) => {
           if (!err) {
+            this.pageNum = 1 //点击查询的时候到第一页
             this.conditions = this.form.getFieldsValue()
-            this.onQuery()
+            this.getList()
           }
         })
       },
 
       onReset() {
         this.form.resetFields();
+        this.pageNum = 1 //点击重置的时候到第一页
         this.conditions = {};
-        this.onQuery();
+        this.getList()
       },
 
       /*选中行改变触发*/
