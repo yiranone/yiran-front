@@ -1,37 +1,38 @@
 <template>
   <a-modal :visible="parent.formVisible"
            :title="title"
-           :width="1200"
+           :width="1000"
            :destroyOnClose="true"
            :confirmLoading="confirmLoading"
            @cancel="parent.formVisible = false"
            @ok="handleOk">
     <a-form :form="form" :hideRequiredMark="true">
       <a-row class="form-row">
-        <a-col :lg="6" :md="12" :sm="24">
-          <a-form-item label="登录名称">
+        <a-col :md="12">
+          <a-form-item label="登录名称" :label-col="{span:8}" :wrapper-col="{span:16}">
             <a-input allowClear placeholder="请输入登录名称"
                      :disabled="formType != '新增'"
                      v-decorator="['loginName', {rules:[{required: true, message: '请输入用户名称'}]}]"/>
           </a-form-item>
         </a-col>
-        <a-col :xl="{span: 6, offset: 2}" :lg="{span: 8}" :md="{span: 12}" :sm="24">
-          <a-form-item v-if="formType != '重置'" label="手机号">
+        <a-col :md="12">
+          <a-form-item v-if="formType != '重置'" label="手机号" :label-col="{span:8}" :wrapper-col="{span:16}">
             <a-input :maxLength="11" allowClear placeholder="请输入手机号"
                      v-decorator="['phoneNumber', {rules: [{required: true, message: '请输入手机号'}]}]"/>
           </a-form-item>
         </a-col>
       </a-row>
 
-      <a-form-item v-if="formType != '重置'" label="手机号" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 20}}"
-                   :colon="false">
-        <a-input :maxLength="11" allowClear placeholder="请输入手机号"
-                 v-decorator="['phoneNumber', {rules: [{required: true, message: '请输入手机号'}]}]"/>
-      </a-form-item>
-      <a-form-item v-if="formType != '重置'" label="部门" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 20}}"
+      <a-form-item v-if="formType != '重置'" label="部门" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
                    :colon="false">
         <a-input :maxLength="11" allowClear
                  v-decorator="['deptId', {rules: [{required: true, message: '请选择部门'}]}]"/>
+      </a-form-item>
+      <a-form-item v-if="formType != '重置'" label="渠道号" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
+                   :colon="false">
+        <a-input :maxLength="11" allowClear
+                 :disabled="formType != '新增'"
+                 v-decorator="['channelId', {rules: [{required: true, message: '请选择渠道'}]}]"/>
       </a-form-item>
       <a-form-item v-if="formType != '重置'" label="角色" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 20}}"
                    :colon="false">
@@ -77,7 +78,7 @@
       initialValue(val) {
         if (JSON.stringify(val) != "{}") {
           let obj = {}, keys = [];
-          keys = ['loginName', 'userName', 'phoneNumber', 'deptId', 'roleIds', 'status']
+          keys = ['loginName', 'userName', 'phoneNumber', 'deptId','channelId', 'roleIds', 'status']
           if (this.formType == '重置') {
             keys = ['loginName', 'password']
           }
