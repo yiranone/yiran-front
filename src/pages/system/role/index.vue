@@ -12,7 +12,7 @@
           <a-button type="danger" :disabled="delets.length == 0"
                     :loading="batchDeleteLoading"
                     v-auth="`delete`"
-                    @click="deleteRecord">
+                    @click="deleteRecord('batch')">
             <a-icon type="delete"/>
             批量删除
           </a-button>
@@ -56,7 +56,7 @@
           <a-popconfirm
               v-if="dataSource.length"
               title="确认删除?"
-              @confirm="() => deleteRecord(record.key)"
+              @confirm="() => deleteRecord(record.roleId)"
           >
             <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
               <a-icon type="delete"/>
@@ -254,16 +254,21 @@
       },
 
       /*删除*/
-      async deleteRecord(key) {
+      async deleteRecord(id) {
+        console.info("deleteRecord id:" + id)
+        if (id === 'batch')  {
+          if(this.delets.length == 0) {
+            this.$message.warn('至少选择一条记录')
+            return
+          }
+          this.batchDeleteLoading = true;
+        }
         this.loading = true
-        if (key == undefined) this.batchDeleteLoading = true;
-        let delets = key == undefined ? this.delets : [key]
-        await us.deleteRole({ids: delets}).then(res => {
+        console.info("deletes:" + this.delets)
+        let delets = id === 'batch' ? this.delets : [id]
+        await us.deleteRole({roleIds: delets}).then(res => {
           this.$message.success('删除成功')
-          this.dataSource = this.dataSource.filter(item => {
-            return !this.delets.includes(item.roleId)
-          })
-          this.total = this.total - this.delets.length
+          this.getList()
         }).catch(res => {
         })
         this.loading = false
