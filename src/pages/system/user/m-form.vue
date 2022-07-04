@@ -16,10 +16,22 @@
           </a-form-item>
         </a-col>
         <a-col :md="12">
+          <a-form-item v-if="formType != '重置'" label="用户名" :label-col="{span:8}" :wrapper-col="{span:16}">
+            <a-input :maxLength="32" allowClear placeholder="请输入用户名"
+                     v-decorator="['userName', {rules: [{required: true, message: '请输入用户名'}]}]"/>
+          </a-form-item>
+        </a-col>
+      </a-row>
+
+      <a-row class="form-row">
+        <a-col :md="12">
           <a-form-item v-if="formType != '重置'" label="手机号" :label-col="{span:8}" :wrapper-col="{span:16}">
             <a-input :maxLength="11" allowClear placeholder="请输入手机号"
                      v-decorator="['phoneNumber', {rules: [{required: true, message: '请输入手机号'}]}]"/>
           </a-form-item>
+        </a-col>
+        <a-col :md="12">
+
         </a-col>
       </a-row>
 

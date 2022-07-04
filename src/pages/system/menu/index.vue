@@ -45,7 +45,7 @@
             <a-icon :type="text"/>
           </template>
           <template slot="action" slot-scope="{text, record}">
-            <a v-if="record.menuType == 'M'" style="margin-right: 8px" @click="addRecord(record)">
+            <a v-if="record.menuType == 'M' || record.menuType == 'C'" style="margin-right: 8px" @click="addRecord(record)">
               <a-icon type="plus"/>
               新增
             </a>
