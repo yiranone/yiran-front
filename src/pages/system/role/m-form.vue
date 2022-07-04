@@ -64,7 +64,7 @@
       initialValue(val) {
         if (JSON.stringify(val) != "{}") {
           let obj = {}, keys = [];
-          keys = ['roleName', 'roleKey', 'roleSort', 'status', 'permIds']
+          keys = [ 'roleId','roleName','roleKey', 'roleSort', 'status', 'permIds']
           keys.forEach(item => {
             obj[item] = val[item] || ''
           })
