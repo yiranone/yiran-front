@@ -11,7 +11,6 @@
         <a-col :md="12">
           <a-form-item label="手机号" :label-col="{span:8}" :wrapper-col="{span:16}">
             <a-input allowClear placeholder="请输入手机号"
-                     :disabled="formType != '新增'"
                      v-decorator="['phone', {rules:[{required: true, message: '请输入手机号'}]}]"/>
           </a-form-item>
         </a-col>
