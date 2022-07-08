@@ -29,4 +29,11 @@ module.exports = {
   CHANNEL_REMOVE_URI: 'system/channel/remove',
   CHANNEL_ADD_URI: 'system/channel/add',
   CHANNEL_EDIT_URI: 'system/channel/edit',
+  /*===会员管理===*/
+  MEMBER_DETAIL_URI: 'system/member/detail',
+  MEMBER_LIST_URI: 'system/member/list',
+  MEMBER_REMOVE_URI: 'system/member/remove',
+  MEMBER_ADD_URI: 'system/member/add',
+  MEMBER_EDIT_URI: 'system/member/edit',
+  MEMBER_RESET_PASSWORD_URI: 'system/member/resetPassword',
 }

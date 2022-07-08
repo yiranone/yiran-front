@@ -92,6 +92,11 @@ const routerMap = {
     name: '渠道管理',
     path: 'channel',
     component: () => import('@/pages/system/channel')
+  },
+  member: {
+    name: '会员管理',
+    path: 'member',
+    component: () => import('@/pages/system/member')
   }
 }
 export default routerMap
