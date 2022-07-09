@@ -128,6 +128,7 @@
     }, {
       title: '手机号',
       dataIndex: 'phone',
+      sorter: true,
       align: 'center',
       width: 90
     }, {
