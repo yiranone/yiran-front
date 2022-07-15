@@ -205,6 +205,12 @@ const columns = [
     align: 'left',
     sorter: true,
     width: 100,
+  },{
+    title: '排序',
+    dataIndex: 'channelSort',
+    align: 'center',
+    sorter: true,
+    width: 65
   }, {
     title: '状态',
     dataIndex: 'status',

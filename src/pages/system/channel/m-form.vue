@@ -17,6 +17,11 @@
                  :disabled="formType != '新增'"
                  v-decorator="['channelCode', {rules: [{required: true, message: '请输入渠道编码'}]}]"/>
       </a-form-item>
+      <a-form-item label="排序" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 20}}"
+                    :colon="false">
+        <a-input-number allowClear :min="1"
+                 v-decorator="['channelSort', {rules: [{required: true, message: '请设置排序'}]}]"/>
+      </a-form-item>
       <a-form-item label="有效期" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 16}}"
                    :colon="false">
         <a-date-picker format="YYYY-MM-DD"
@@ -54,7 +59,7 @@
       initialValue(val) {
         if (JSON.stringify(val) != "{}") {
           let obj = {}, keys = [];
-          keys = ['channelName', 'channelCode', 'expireDate', 'status']
+          keys = ['channelName', 'channelCode','channelSort', 'expireDate', 'status']
           keys.forEach(item => {
             obj[item] = val[item] || ''
           })
