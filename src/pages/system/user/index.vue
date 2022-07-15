@@ -347,12 +347,9 @@
         this.loading = true
         if (id === 'batch') this.batchDeleteLoading = true;
         let delets = id === 'batch' ? this.delets : [id]
-        await us.deleteUser({ids: delets}).then(res => {
+        await us.deleteUser({userIds: delets}).then(res => {
           this.$message.success('删除成功')
-          this.dataSource = this.dataSource.filter(item => {
-            return !this.delets.includes(item.roleId)
-          })
-          this.total = this.total - this.delets.length
+          this.getList()
         }).catch(res => {
         })
         this.loading = false
