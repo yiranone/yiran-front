@@ -78,6 +78,11 @@ const routerMap = {
     path: 'role',
     component: () => import('@/pages/system/role')
   },
+  dept: {
+    name: '部门管理',
+    path: 'dept',
+    component: () => import('@/pages/system/dept')
+  },
   user: {
     name: '用户管理',
     path: 'user',

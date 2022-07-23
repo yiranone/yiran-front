@@ -20,10 +20,15 @@ module.exports = {
   ROLE_ADD_URI: 'system/role/add', // 角色新增
   ROLE_EDIT_URI: 'system/role/edit', // 角色编辑
   /*===权限管理===*/
-  PERM_LIST_URI: 'system/perm/list', // 权限列表
-  PERM_REMOVE_URI: 'system/perm/remove', // 权限删除
-  PERM_ADD_URI: 'system/perm/add', // 权限新增
-  PERM_EDIT_URI: 'system/perm/edit', // 权限编辑
+  PERM_LIST_URI: 'system/perm/list',
+  PERM_REMOVE_URI: 'system/perm/remove',
+  PERM_ADD_URI: 'system/perm/add',
+  PERM_EDIT_URI: 'system/perm/edit',
+  /*===部门管理===*/
+  DEPT_LIST_URI: 'system/dept/list',
+  DEPT_REMOVE_URI: 'system/dept/remove',
+  DEPT_ADD_URI: 'system/dept/add',
+  DEPT_EDIT_URI: 'system/dept/edit',
   /*===渠道管理===*/
   CHANNEL_LIST_URI: 'system/channel/list',
   CHANNEL_REMOVE_URI: 'system/channel/remove',

@@ -13,6 +13,17 @@ const dataSource = {
     return request(API.ROLE_LIST_URI, METHOD.POST, params)
   },
 
+  /*部门管理*/
+  deptList: async (params) => {
+    return request(API.DEPT_LIST_URI, METHOD.POST, params)
+  },
+  deptRemove(params) {
+    return request(API.DEPT_REMOVE_URI, METHOD.POST, params)
+  },
+  deptEdit(params, type) {
+    return request(type === '新增'? API.DEPT_ADD_URI : API.DEPT_EDIT_URI, METHOD.POST, params)
+  },
+
   /*用户列表*/
   userList: async (params) => {
     return request(API.USER_LIST_URI, METHOD.POST, params)
