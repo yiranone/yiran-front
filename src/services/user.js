@@ -4,9 +4,6 @@ import {request, METHOD, removeAuthorization} from '../utils/request'
 const user = {
   /**
    * 登录服务
-   * @param name 账户名
-   * @param password 账户密码
-   * @returns {Promise<AxiosResponse<T>>}
    */
   login: async (name, password) => {
     return request(API.LOGIN, METHOD.POST, {

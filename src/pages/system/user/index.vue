@@ -123,7 +123,11 @@
           </a-popconfirm>
         </template>
       </standard-table>
-      <m-form @success="mFormSuccess"/>
+      <m-form :deptOptions="deptOptions"
+                :statusOptions="statusOptions"
+                :sexOptions="sexOptions"
+                :channelOptions="channelOptions"
+                @success="mFormSuccess"/>
 <!--      <m-reset-pwd />-->
     </a-card>
   </page-layout>
@@ -132,8 +136,8 @@
 <script>
   import PageLayout from '@/layouts/PageLayout'
   import StandardTable from '@/components/table/StandardTable'
-  import MForm from './m-form'
-  import {dataSource as ds,userService as us} from '../../../services/index'
+  import MForm from './user-form'
+  import {dataSource as ds,userService as us, metadataSource as ms} from '@/services/index'
 
   const columns = [
     {
@@ -194,6 +198,16 @@
     data() {
       return {
         id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
+        // 状态数据字典
+        channelOptions: [],
+        statusOptions: [],
+        sexOptions: [],
+        // 部门树选项
+        deptOptions: [{
+          id: 0,
+          name: '',
+          children: []
+        }],
         loading: false,
         columns: columns,
         dataSource: [],
@@ -212,6 +226,15 @@
         batchDeleteLoading: false,
         resetPwdVisible: false
       }
+    },
+
+
+    created() {
+      this.getList()
+      this.getRoleList()
+      this.getChannelList()
+      this.getDeptTree()
+      this.getUserStatusList()
     },
 
     provide() {
@@ -236,16 +259,10 @@
       }
     },
 
-    created() {
-      this.getList()
-      this.getRoleList()
-    },
-
     beforeRouteLeave(to, from, next) {
       this.formVisible = false
       next()
     },
-
 
     methods: {
       /*获取数据列表*/
@@ -267,6 +284,23 @@
         ds.roleList({pageNum: 1, pageSize: 100}).then(res => {
           const {rows, count} = res
           this.roleList = rows
+        })
+      },
+      getChannelList () {
+        ms.channelAll().then(data => {
+          this.channelOptions = data
+        })
+      },
+
+      getDeptTree () {
+        ms.deptTree().then(data => {
+          this.deptOptions = data
+        })
+      },
+
+      getUserStatusList() {
+        ms.dictListByType('system_user_status').then(data => {
+          this.statusOptions = data
         })
       },
 

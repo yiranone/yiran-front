@@ -2,7 +2,6 @@ import API from './api'
 import {METHOD, request} from '../utils/request'
 
 const dataSource = {
-
   /*菜单列表*/
   menuList: async (params) => {
     return request(API.MENU_LIST_URI, METHOD.POST, params)

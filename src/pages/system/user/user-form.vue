@@ -35,17 +35,33 @@
         </a-col>
       </a-row>
 
-      <a-form-item v-if="formType != '重置'" label="部门" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
+      <a-form-item label="部门" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}">
+        <a-tree-select
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="deptOptions"
+            placeholder="请选择"
+            :replaceFields="replaceFields"
+            tree-default-expand-all
+            v-decorator="['deptId', {rules: [{required: true, message: '请选择部门'}]}]"
+        >
+        </a-tree-select>
+      </a-form-item>
+
+<!--      <a-form-item v-if="formType != '重置'" label="部门" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
                    :colon="false">
         <a-input :maxLength="11" allowClear
                  v-decorator="['deptId', {rules: [{required: true, message: '请选择部门'}]}]"/>
-      </a-form-item>
-      <a-form-item v-if="formType != '重置'" label="渠道号" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
+      </a-form-item>-->
+      <a-form-item label="渠道号" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 8}}"
                    :colon="false">
-        <a-input :maxLength="11" allowClear
-                 :disabled="formType != '新增'"
-                 v-decorator="['channelId', {rules: [{required: true, message: '请选择渠道'}]}]"/>
+        <a-select placeholder="请选择"
+                  :disabled="formType != '新增'"
+                  v-decorator="['channelId', {rules: [{required: true, message: '请选择渠道'}]}]">
+          <a-select-option v-for="(d, index) in channelOptions" :key="index" :value="d.channelId" >{{ d.channelName }}</a-select-option>
+        </a-select>
       </a-form-item>
+
       <a-form-item v-if="formType != '重置'" label="角色" :labelCol="{sm: {span: 4}}" :wrapperCol="{sm: {span: 20}}"
                    :colon="false">
         <a-checkbox-group v-decorator="['roleIds', {rules: [{required: true, message: '请选择角色'}]}]">
@@ -69,21 +85,36 @@
 </template>
 
 <script>
-  import {userService as us} from '../../../services/index'
+  import {userService as us } from '@/services/index'
 
   export default {
-    name: "m-form",
+    name: "user-form",
+    components: {},
+    props: {
+      channelOptions:{},
+      deptOptions: {
+        type: Array,
+        required: true
+      },
+      statusOptions: {
+        type: Array,
+        required: true
+      },
+      sexOptions: {
+        type: Array,
+        required: true
+      }
+    },
     inject: ['parent'],
     data() {
       return {
-        form: this.$form.createForm(this, {name: 'mform'}),
-        statusOptions: [
-          {label: '正常', value: '0'},
-          {label: '停用', value: '1'},
-        ],
+        form: this.$form.createForm(this),
+        replaceFields: { children: 'children', title: 'name', key: 'id', value: 'id' },
         confirmLoading: false,
         roleIds: []
       }
+    },
+    created() {
     },
 
     watch: {
@@ -145,7 +176,8 @@
             }
           }
         })
-      }
+      },
+
     }
   }
 </script>

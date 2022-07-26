@@ -2,6 +2,10 @@ module.exports = {
   LOGIN: 'login', // 登录
   ROUTES: 'menu', // 获取路由配置
 
+  METADATA_CHANNEL_ALL: 'metadata/channel/all',
+  METADATA_DEPT_ALL: 'metadata/dept/all',
+  METADATA_DEPT_TREE: 'metadata/dept/tree',
+  METADATA_DICT_LIST: 'metadata/dict/list',
   /*===菜单管理===*/
   MENU_LIST_URI: 'system/menu/list', // 菜单列表
   MENU_REMOVE_URI: 'system/menu/remove', // 用户删除
