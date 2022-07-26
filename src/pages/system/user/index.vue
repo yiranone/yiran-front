@@ -107,20 +107,32 @@
             <a-icon type="edit"/>
             编辑
           </a>
-          <a class="action-rest" :class="{'disabled': record.admin}" style="margin-right: 8px" @click="resetPwd(record)">
-            <a-icon type="key"/>
-            重置密码
-          </a>
-          <a-popconfirm
-              v-if="dataSource.length && !record.admin"
-              title="确认删除?"
-              @confirm="() => deleteRecord(record.userId)"
-          >
-            <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
-              <a-icon type="delete"/>
-              删除
+          <a-divider type="vertical"/>
+          <a-dropdown >
+            <a class="ant-dropdown-link" @click="e => e.preventDefault()">
+              更多操作 <a-icon type="down" />
             </a>
-          </a-popconfirm>
+            <a-menu slot="overlay">
+              <a-menu-item>
+                <a @click="$refs.resetPassword.handleResetPwd(record)">
+                  <a-icon type="key" />
+                  重置密码
+                </a>
+              </a-menu-item>
+              <a-menu-item>
+                <a-popconfirm
+                    v-if="dataSource.length && !record.admin"
+                    title="确认删除?"
+                    @confirm="() => deleteRecord(record.userId)"
+                >
+                  <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
+                    <a-icon type="delete"/>
+                    删除
+                  </a>
+                </a-popconfirm>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </template>
       </standard-table>
       <m-form :deptOptions="deptOptions"
@@ -129,6 +141,9 @@
                 :channelOptions="channelOptions"
                 @success="mFormSuccess"/>
 <!--      <m-reset-pwd />-->
+      <reset-password
+          ref="resetPassword"
+      />
     </a-card>
   </page-layout>
 </template>
@@ -137,6 +152,7 @@
   import PageLayout from '@/layouts/PageLayout'
   import StandardTable from '@/components/table/StandardTable'
   import MForm from './user-form'
+  import ResetPassword from "./reset-password";
   import {dataSource as ds,userService as us, metadataSource as ms} from '@/services/index'
 
   const columns = [
@@ -194,7 +210,7 @@
   ]
 
   export default {
-    components: {PageLayout, StandardTable, MForm},
+    components: {PageLayout, StandardTable, MForm, ResetPassword},
     data() {
       return {
         id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
@@ -359,21 +375,6 @@
         }).catch(res => {
           console.info("用户编辑失败" + res)
         })
-      },
-
-      /*重置密码*/
-      resetPwd(record) {
-        this.formType = '重置'
-        this.initialValue = {...record}
-        us.deleteUser({ids: delets}).then(res => {
-          this.$message.success('删除成功')
-          this.dataSource = this.dataSource.filter(item => {
-            return !this.delets.includes(item.roleId)
-          })
-          this.total = this.total - this.delets.length
-        }).catch(res => {
-        })
-        this.formVisible = true
       },
 
       /*删除*/
