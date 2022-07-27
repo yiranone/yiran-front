@@ -83,6 +83,11 @@ const routerMap = {
     path: 'dept',
     component: () => import('@/pages/system/dept')
   },
+  dict: {
+    name: '数据字典',
+    path: 'dict',
+    component: () => import('@/pages/system/dict')
+  },
   user: {
     name: '用户管理',
     path: 'user',

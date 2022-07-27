@@ -2,7 +2,7 @@
   <page-layout title=" ">
     <div slot="headerContent">
     </div>
-    <a-card :id="id">
+    <a-card>
       <div class="search">
         <a-form layout="horizontal" @submit="onSubmit" :form="form">
           <a-row>
@@ -213,7 +213,6 @@
     components: {PageLayout, StandardTable, MForm, ResetPassword},
     data() {
       return {
-        id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
         // 状态数据字典
         channelOptions: [],
         statusOptions: [],

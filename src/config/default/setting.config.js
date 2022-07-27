@@ -15,8 +15,11 @@ module.exports = {
   pageWidth: 'fixed',                   //内容区域宽度，fixed:固定宽度，fluid:流式宽度
   weekMode: false,                      //色弱模式，true:开启，false:不开启
   multiPage: false,                     //多页签模式，true:开启，false:不开启
+  tableSize: 'middle',                  //表格字体大小 default middle small
+  tableBordered: false,                 //表格是否有边框，默认只有横着的
   cachePage: true,                      //是否缓存页面数据，仅多页签模式下生效，true 缓存, false 不缓存
   hideSetting: false,                   //隐藏设置抽屉，true:隐藏，false:不隐藏
+  hideFooter: false,                    //隐藏底部
   systemName: '麻瓜ADMIN',               //账户标识 登陆页面上方
   copyright: '2022 麻瓜后台',             //copyright
   asyncRoutes: true,                    //异步加载路由，true:开启，false:不开启

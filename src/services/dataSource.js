@@ -12,6 +12,38 @@ const dataSource = {
     return request(API.ROLE_LIST_URI, METHOD.POST, params)
   },
 
+  /*数据字典*/
+  dictDetail: async (params) => {
+    return request(API.DICT_DETAIL_URI, METHOD.POST, params)
+  },
+  dictList: async (params) => {
+    return request(API.DICT_LIST_URI, METHOD.POST, params)
+  },
+  dictRemove(params) {
+    return request(API.DICT_REMOVE_URI, METHOD.POST, params)
+  },
+  dictEdit(params) {
+    return request(API.DICT_EDIT_URI, METHOD.POST, params)
+  },
+  dictAdd(params) {
+    return request( API.DICT_ADD_URI , METHOD.POST, params)
+  },
+  dictDataDetail: async (params) => {
+    return request(API.DICT_DATA_DETAIL_URI, METHOD.POST, params)
+  },
+  dictDataList: async (params) => {
+    return request(API.DICT_DATA_LIST_URI, METHOD.POST, params)
+  },
+  dictDataRemove(params) {
+    return request(API.DICT_DATA_REMOVE_URI, METHOD.POST, params)
+  },
+  dictDataEdit(params) {
+    return request( API.DICT_DATA_EDIT_URI, METHOD.POST, params)
+  },
+  dictDataAdd(params) {
+    return request( API.DICT_DATA_ADD_URI , METHOD.POST, params)
+  },
+
   /*部门管理*/
   deptList: async (params) => {
     return request(API.DEPT_LIST_URI, METHOD.POST, params)

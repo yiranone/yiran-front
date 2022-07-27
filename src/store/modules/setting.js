@@ -63,6 +63,12 @@ export default {
     setMultiPage (state, multiPage) {
       state.multiPage = multiPage
     },
+    setTableSize (state, tableSize) {
+      state.tableSize = tableSize
+    },
+    setTableBordered (state, tableBordered) {
+      state.tableBordered = tableBordered
+    },
     setAnimate (state, animate) {
       state.animate = animate
     },
@@ -80,6 +86,9 @@ export default {
     },
     setHideSetting(state, hideSetting) {
       state.hideSetting = hideSetting
+    },
+    setHideFooter(state, hideFooter) {
+      state.hideFooter = hideFooter
     },
     correctPageMinHeight(state, minHeight) {
       state.pageMinHeight += minHeight

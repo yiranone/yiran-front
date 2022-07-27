@@ -28,6 +28,17 @@ module.exports = {
   PERM_REMOVE_URI: 'system/perm/remove',
   PERM_ADD_URI: 'system/perm/add',
   PERM_EDIT_URI: 'system/perm/edit',
+  /*===数据字典管理===*/
+  DICT_DETAIL_URI: 'system/dict/detail',
+  DICT_LIST_URI: 'system/dict/list',
+  DICT_REMOVE_URI: 'system/dict/remove',
+  DICT_ADD_URI: 'system/dict/add',
+  DICT_EDIT_URI: 'system/dict/edit',
+  DICT_DATA_DETAIL_URI: 'system/dict/data/detail',
+  DICT_DATA_LIST_URI: 'system/dict/data/list',
+  DICT_DATA_REMOVE_URI: 'system/dict/data/remove',
+  DICT_DATA_ADD_URI: 'system/dict/data/add',
+  DICT_DATA_EDIT_URI: 'system/dict/data/edit',
   /*===部门管理===*/
   DEPT_LIST_URI: 'system/dept/list',
   DEPT_REMOVE_URI: 'system/dept/remove',

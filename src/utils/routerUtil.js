@@ -159,6 +159,7 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
   const rootRoute = router.options.routes.find(item => item.path === '/')
   const menuRoutes = rootRoute && rootRoute.children
   if (menuRoutes) {
+    // store.commit('setMenuData', menuRoutes)
     store.commit('setting/setMenuData', menuRoutes)
   }
 }
