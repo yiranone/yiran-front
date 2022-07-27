@@ -80,7 +80,6 @@ const respCommon = {
    * @returns {Promise<never>}
    */
   onRejected(error, options) {
-    debugger
     const {message} = options
     message.error(error.message)
     return Promise.reject(error)
