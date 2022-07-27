@@ -17,6 +17,7 @@ import aLink from '@/components/a-link'
 import permission from '@/directive/permission'
 import {TableSetting } from '@/components'
 import {parseTime, selectDictLabel, selectDictLabels} from '@/utils/dict-utils'
+import { download } from '@/utils/request'
 
 if (process.env.NODE_ENV === 'development') require('@/mock');
 
@@ -28,6 +29,7 @@ const i18n = initI18n('CN', 'US')
 Vue.prototype.parseTime=parseTime
 Vue.prototype.selectDictLabel=selectDictLabel
 Vue.prototype.selectDictLabels=selectDictLabels
+Vue.prototype.download = download
 
 Vue.use(Antd)
 Vue.config.productionTip = false

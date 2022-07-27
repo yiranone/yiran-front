@@ -21,16 +21,6 @@
       <a-form-model-item label="备注" prop="remark">
         <a-input v-model="form.remark" placeholder="请输入内容" type="textarea" allow-clear />
       </a-form-model-item>
-      <div class="bottom-control">
-        <a-space>
-          <a-button type="primary" :loading="submitLoading" @click="submitForm">
-            保存
-          </a-button>
-          <a-button type="dashed" @click="cancel">
-            取消
-          </a-button>
-        </a-space>
-      </div>
     </a-form-model>
   </a-modal>
 </template>
@@ -104,7 +94,7 @@ export default {
     /** 修改按钮操作 */
     handleUpdate (row, ids) {
       this.reset()
-      const dictId = row ? row.dictId : ids
+      const dictId = row ? row.dictId : ids[0]
       dataSource.dictDetail({dictId:dictId}).then(response => {
         this.form = response
         this.open = true

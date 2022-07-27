@@ -92,7 +92,7 @@ case 1:
                      .replace(/\\v/g,'\v')
                      .replace(/\\f/g,'\f')
                      .replace(/\\b/g,'\b');
-        
+
 break;
 case 2:
 this.$ = yytext == String(Number(yytext))? Number(yytext): yytext;
@@ -204,8 +204,10 @@ parse: function parse(input) {
                     }
                 }
                 if (lexer.showPosition) {
+                    debugger
                     errStr = 'Parse error on line ' + (yylineno + 1) + ':\n' + lexer.showPosition() + '\nExpecting ' + expected.join(', ') + ', got \'' + (this.terminals_[symbol] || symbol) + '\'';
                 } else {
+                    debugger
                     errStr = 'Parse error on line ' + (yylineno + 1) + ': Unexpected ' + (symbol == EOF ? 'end of input' : '\'' + (this.terminals_[symbol] || symbol) + '\'');
                 }
                 this.parseError(errStr, {

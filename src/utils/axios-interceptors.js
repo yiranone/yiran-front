@@ -49,6 +49,11 @@ const respCommon = {
   onFulfilled(response, options) {
     const {message} = options
     let res = response.data
+    if (response.headers && (response.headers['content-type'] === 'application/x-msdownload' || response.headers['content-type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
+      // 我改了这里～
+      debugger
+      return
+    }
     if (res.code === 200) {
       // message.error('无此接口权限')
       // console.info(router)
@@ -75,6 +80,7 @@ const respCommon = {
    * @returns {Promise<never>}
    */
   onRejected(error, options) {
+    debugger
     const {message} = options
     message.error(error.message)
     return Promise.reject(error)

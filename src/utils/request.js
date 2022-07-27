@@ -1,5 +1,10 @@
 import axios from 'axios'
 import Cookie from 'js-cookie'
+import notification from 'ant-design-vue/es/notification'
+import message from 'ant-design-vue/es/message'
+import { blobValidate } from '@/utils/dict-utils'
+
+import { saveAs } from 'file-saver'
 
 // 跨域认证信息 header 名
 const xsrfHeaderName = 'Authorization'
@@ -9,8 +14,12 @@ axios.defaults.withCredentials= true
 axios.defaults.xsrfHeaderName= xsrfHeaderName
 axios.defaults.xsrfCookieName= xsrfHeaderName
 axios.defaults.transformResponse = [function (data) {
-  /* eslint-disable no-undef */
-  return jsonlint.parse(data)
+  try {
+    /* eslint-disable no-undef */
+    return jsonlint.parse(data)
+  } catch (error) {
+    return data
+  }
 }]
 
 // 认证类型
@@ -34,12 +43,12 @@ const METHOD = {
  * @param params 请求参数
  * @returns {Promise<AxiosResponse<T>>}
  */
-async function request(url, method, params) {
+async function request(url, method, params, conf) {
   switch (method) {
     case METHOD.GET:
       return axios.get(`/api/${url}`, {params})
     case METHOD.POST:
-      return axios.post(`/api/${url}`, params)
+      return axios.post(`/api/${url}`, params, conf)
     default:
       return axios.get(`/api/${url}`, {params})
   }
@@ -161,10 +170,73 @@ function parseUrlParams(url) {
   return params
 }
 
+// 通用下载方法
+function download (url, params, filename) {
+  const notificationKey = 'download'
+  notification.open({
+    key: notificationKey,
+    message: '正在下载数据，请稍候',
+    duration: null,
+    icon: h => {
+      return h(
+          'a-icon',
+          {
+            props: {
+              type: 'loading'
+            }
+          }
+      )
+    }
+  })
+  const config = {
+    method: 'get',
+    url: "api/" + url,
+    headers: { 'Content-Type': 'application/json' },
+    responseType: 'blob',
+    transformResponse: function (data){return data}
+  };
+  const request2 = axios.create({
+    timeout: 6000, // 请求超时时间
+  })
+  return request2.post("api/" + url, params,{ responseType: "blob" } ).then(async (resp) => {
+    debugger
+    const { data, headers } = resp
+
+    const isBlob = blobValidate(data)
+    if (isBlob) {
+      // const fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
+      const blob = new Blob([data])
+      let url = window.URL.createObjectURL(blob)
+      let dom = document.createElement('a')
+      dom.href = url
+      dom.download = decodeURI(filename)
+      dom.style.display = 'none'
+      document.body.appendChild(dom)
+      dom.click()
+      dom.parentNode.removeChild(dom)
+      window.URL.revokeObjectURL(url)
+
+      // saveAs(blob, filename)
+      message.success('下载成功')
+    } else {
+      const resText = resp.text()
+      const rspObj = JSON.parse(resText)
+      const errMsg = rspObj.msg
+      message.error(errMsg)
+    }
+    notification.close(notificationKey)
+  }).catch((r) => {
+    debugger
+    message.error('下载文件出现错误，请联系管理员！')
+    notification.close(notificationKey)
+  })
+}
+
 export {
   METHOD,
   AUTH_TYPE,
   request,
+  download,
   setAuthorization,
   removeAuthorization,
   checkAuthorization,

@@ -26,7 +26,7 @@ const dataSource = {
     return request(API.DICT_EDIT_URI, METHOD.POST, params)
   },
   dictAdd(params) {
-    return request( API.DICT_ADD_URI , METHOD.POST, params)
+    return request(API.DICT_ADD_URI , METHOD.POST, params)
   },
   dictDataDetail: async (params) => {
     return request(API.DICT_DATA_DETAIL_URI, METHOD.POST, params)

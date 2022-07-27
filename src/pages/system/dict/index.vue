@@ -74,8 +74,6 @@
         :statusOptions="statusOptions"
         @ok="getList"
       />
-      <!-- 数据展示         :size="tableSize"
- -->
       <a-table :size="tableSize"
         :loading="loading"
         rowKey="dictId"
@@ -86,11 +84,9 @@
         @change="onSortChange"
         :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
         :pagination="false" :bordered="tableBordered">
-<!--
-        :bordered="tableBordered" -->  <span
+        <span
           slot="expandedRowRender"
-          slot-scope="text"
-        >
+          slot-scope="text">
           <dict-data
             ref="dictData"
             :dictId="text.dictId"
@@ -134,7 +130,6 @@
 import {dataSource,metadataSource} from '@/services/index'
 import CreateForm from './modules/CreateForm'
 import DictData from './modules/DictData'
-// import { tableMixin } from '@/store/table-mixin'
 import { tableMixin } from '@/store/table-mixin'
 import PageLayout from "@/layouts/PageLayout";
 
@@ -317,17 +312,17 @@ export default {
     },
     /** 导出按钮操作 */
     handleExport () {
-      // var that = this
-      // this.$confirm({
-      //   title: '是否确认导出?',
-      //   content: '此操作将导出当前条件下所有数据而非选中数据',
-      //   onOk () {
-      //     that.download('system/dict/type/export', {
-      //       ...that.queryParam
-      //     }, `type_${new Date().getTime()}.xlsx`)
-      //   },
-      //   onCancel () {}
-      // })
+      var that = this
+      this.$confirm({
+        title: '是否确认导出?',
+        content: '此操作将导出当前条件下所有数据而非选中数据',
+        onOk () {
+          that.download('system/dict/type/export', {
+            ...that.queryParam
+          }, `type_${new Date().getTime()}.xlsx`)
+        },
+        onCancel () {}
+      })
     },
     /** 清理缓存按钮操作 */
     handleRefreshCache () {
