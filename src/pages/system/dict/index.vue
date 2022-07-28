@@ -292,7 +292,7 @@ export default {
     /** 删除按钮操作 */
     handleDelete (row) {
       var that = this
-      const dictIds = row.dictId || this.ids
+      const dictIds = row.dictId ? [row.dictId] : this.ids
       this.$confirm({
         title: '确认删除所选中数据?',
         content: '当前选中字典编号为' + dictIds + '的数据',
