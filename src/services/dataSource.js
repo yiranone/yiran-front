@@ -34,8 +34,8 @@ const dataSource = {
   dictDataList: async (params) => {
     return request(API.DICT_DATA_LIST_URI, METHOD.POST, params)
   },
-  dictDataRemove(params) {
-    return request(API.DICT_DATA_REMOVE_URI, METHOD.POST, params)
+  dictDataDelete(params) {
+    return request(API.DICT_DATA_DELETE_URI, METHOD.POST, params)
   },
   dictDataEdit(params) {
     return request( API.DICT_DATA_EDIT_URI, METHOD.POST, params)

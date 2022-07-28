@@ -4,8 +4,6 @@ import notification from 'ant-design-vue/es/notification'
 import message from 'ant-design-vue/es/message'
 import { blobValidate } from '@/utils/dict-utils'
 
-import { saveAs } from 'file-saver'
-
 // 跨域认证信息 header 名
 const xsrfHeaderName = 'Authorization'
 
@@ -13,14 +11,14 @@ axios.defaults.timeout = 5000
 axios.defaults.withCredentials= true
 axios.defaults.xsrfHeaderName= xsrfHeaderName
 axios.defaults.xsrfCookieName= xsrfHeaderName
-axios.defaults.transformResponse = [function (data) {
-  try {
-    /* eslint-disable no-undef */
-    return jsonlint.parse(data)
-  } catch (error) {
-    return data
-  }
-}]
+// axios.defaults.transformResponse = [function (data) {
+//   try {
+//     /* eslint-disable no-undef */
+//     return jsonlint.parse(data)
+//   } catch (error) {
+//     return data
+//   }
+// }]
 
 // 认证类型
 const AUTH_TYPE = {
@@ -188,24 +186,18 @@ function download (url, params, filename) {
       )
     }
   })
-  const config = {
-    method: 'get',
-    url: "api/" + url,
-    headers: { 'Content-Type': 'application/json' },
-    responseType: 'blob',
-    transformResponse: function (data){return data}
-  };
-  const request2 = axios.create({
+
+  const downloadRequest = axios.create({
     timeout: 6000, // 请求超时时间
   })
-  return request2.post("api/" + url, params,{ responseType: "blob" } ).then(async (resp) => {
-    debugger
-    const { data, headers } = resp
 
+  return request( url, METHOD.POST, params,{ responseType: "blob" } ).then(async (resp) => {
+    const { data, headers } = resp
     const isBlob = blobValidate(data)
     if (isBlob) {
-      // const fileName = headers['content-disposition'].replace(/\w+;filename=(.*)/, '$1')
       const blob = new Blob([data])
+      // console.log(data.length)
+      // console.log(data)
       let url = window.URL.createObjectURL(blob)
       let dom = document.createElement('a')
       dom.href = url
@@ -215,8 +207,6 @@ function download (url, params, filename) {
       dom.click()
       dom.parentNode.removeChild(dom)
       window.URL.revokeObjectURL(url)
-
-      // saveAs(blob, filename)
       message.success('下载成功')
     } else {
       const resText = resp.text()

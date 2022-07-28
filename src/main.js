@@ -5,7 +5,6 @@ import './theme/index.less'
 import Antd from 'ant-design-vue'
 import 'ant-design-vue/dist/antd.css';
 import Viser from 'viser-vue'
-import '@/mock'
 import store from './store'
 import 'animate.css/source/animate.css'
 import Plugins from '@/plugins'
@@ -18,8 +17,6 @@ import permission from '@/directive/permission'
 import {TableSetting } from '@/components'
 import {parseTime, selectDictLabel, selectDictLabels} from '@/utils/dict-utils'
 import { download } from '@/utils/request'
-
-if (process.env.NODE_ENV === 'development') require('@/mock');
 
 // const router = initRouter()
 console.info("main.js前端初始化目录,未加载后台目录之前:" + JSON.stringify(router.options.routes))

@@ -77,8 +77,6 @@
 </template>
 
 <script>
-  import Mock from 'mockjs'
-  import '@/mock/extend'
   import CommonLayout from '../../layouts/CommonLayout'
   import {userService as us} from '../../services'
   import {setAuthorization} from '../../utils/request'
@@ -130,7 +128,7 @@
         // this.setRoles(roles)
         setAuthorization({token: res.token})
         // 获取路由配置
-        this.$message.success(Mock.mock('@TIMEFIX').CN + '，欢迎回来', 3)
+        this.$message.success('，欢迎回来', 3)
         loadRoutes({router: this.$router, store: this.$store, i18n: this.$i18n})
         // this.getWebsocketInfo()
         this.$router.push('/home')

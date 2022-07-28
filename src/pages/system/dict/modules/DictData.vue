@@ -30,6 +30,7 @@
       <a-table
         :loading="loading"
         rowKey="dictCode"
+        :size="tableSize"
         :columns="columns"
         :data-source="list"
         :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
@@ -37,9 +38,6 @@
         :pagination="false">
         <span slot="status" slot-scope="text, record">
           {{ statusFormat(record) }}
-        </span>
-        <span slot="createTime" slot-scope="text, record">
-          {{ parseTime(record.createTime) }}
         </span>
         <span slot="operation" slot-scope="text, record">
           <a @click="$refs.createDataForm.handleUpdate(record)" v-hasPermi="['system:dict:edit']">
@@ -89,7 +87,6 @@ export default {
       multiple: true,
       ids: [],
       loading: false,
-      total: 0,
       // 状态数据字典
       statusOptions: [],
       queryParam: {
@@ -137,7 +134,6 @@ export default {
           title: '创建时间',
           dataIndex: 'createTime',
           ellipsis: true,
-          scopedSlots: { customRender: 'createTime' },
           align: 'center'
         },
         {
@@ -155,8 +151,8 @@ export default {
   created () {
     this.queryParam.dictType = this.dictType
     this.getList()
-    metadataSource.dictListByType('system_normal_disable').then(response => {
-      this.statusOptions = response
+    metadataSource.dictListByType('system_normal_disable').then(data => {
+      this.statusOptions = data
     })
   },
   computed: {
@@ -166,9 +162,8 @@ export default {
   methods: {
     getList () {
       this.loading = true
-      dataSource.dictDataList(this.queryParam).then(response => {
-          this.list = response.rows
-          this.total = response.total
+      dataSource.dictDataList(this.queryParam).then(data => {
+          this.list = data
           this.loading = false
         }
       )
@@ -179,7 +174,6 @@ export default {
     },
     /** 搜索按钮操作 */
     handleQuery () {
-      this.queryParam.pageNum = 1
       this.getList()
     },
     /** 重置按钮操作 */
@@ -202,19 +196,16 @@ export default {
     /** 删除按钮操作 */
     handleDelete (row) {
       var that = this
-      const dictCodes = row.dictCode || this.ids
+      const dictCodes = [row.dictCode] || this.ids
       this.$confirm({
         title: '确认删除所选中数据?',
         content: '当前选中字典编码为' + dictCodes + '的数据',
         onOk () {
-          return dataSource.dictDataRemove({ids:dictCodes})
+          return dataSource.dictDataDelete({dictCodes:dictCodes})
             .then(() => {
               that.onSelectChange([], [])
               that.getList()
-              that.$message.success(
-                '删除成功',
-                3
-              )
+              that.$message.success('删除成功')
           })
         },
         onCancel () {}

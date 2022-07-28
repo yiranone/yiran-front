@@ -58,9 +58,9 @@
         <a-button type="primary" @click="handleExport" v-hasPermi="['system:dict:export']">
           <a-icon type="download" />导出
         </a-button>
-        <a-button type="dashed" :loading="refreshing" @click="handleRefreshCache" v-hasPermi="['system:dict:remove']">
+<!--        <a-button type="dashed" :loading="refreshing" @click="handleRefreshCache" v-hasPermi="['system:dict:remove']">
           <a-icon type="redo" />刷新缓存
-        </a-button>
+        </a-button>-->
         <table-setting
           :style="{float: 'right'}"
           :table-size.sync="tableSize"
@@ -319,7 +319,7 @@ export default {
         onOk () {
           that.download('system/dict/type/export', {
             ...that.queryParam
-          }, `type_${new Date().getTime()}.xlsx`)
+          }, `字典类型${new Date().getTime()}.xlsx`)
         },
         onCancel () {}
       })

@@ -49,11 +49,12 @@ const respCommon = {
   onFulfilled(response, options) {
     const {message} = options
     let res = response.data
-    if (response.headers && (response.headers['content-type'] === 'application/x-msdownload' || response.headers['content-type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')) {
-      // 我改了这里～
-      debugger
-      return
-    }
+    //下载文件的处理
+    const respHeader = response.headers['content-type'];
+    if(respHeader.indexOf("application/vnd.openxmlformats") == 0 || respHeader.indexOf("application/x-msdownload") == 0)
+      return response;
+    if(respHeader.indexOf("application/json") < 0)
+      return response;
     if (res.code === 200) {
       // message.error('无此接口权限')
       // console.info(router)
@@ -69,7 +70,8 @@ const respCommon = {
       //removeAuthorization() //用户没有登陆，删除token
       return Promise.reject(res)
     } else {
-      message.warn(res.msg)
+      if(res.msg != null)
+        message.warn(res.msg)
       return Promise.reject(res)
     }
   },

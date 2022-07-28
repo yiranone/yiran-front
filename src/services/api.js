@@ -36,7 +36,7 @@ module.exports = {
   DICT_EDIT_URI: 'system/dict/type/edit',
   DICT_DATA_DETAIL_URI: 'system/dict/data/detail',
   DICT_DATA_LIST_URI: 'system/dict/data/list',
-  DICT_DATA_REMOVE_URI: 'system/dict/data/remove',
+  DICT_DATA_DELETE_URI: 'system/dict/data/delete',
   DICT_DATA_ADD_URI: 'system/dict/data/add',
   DICT_DATA_EDIT_URI: 'system/dict/data/edit',
   /*===部门管理===*/
