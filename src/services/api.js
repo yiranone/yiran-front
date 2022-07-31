@@ -28,6 +28,12 @@ module.exports = {
   PERM_REMOVE_URI: 'system/perm/remove',
   PERM_ADD_URI: 'system/perm/add',
   PERM_EDIT_URI: 'system/perm/edit',
+  /*===配置管理===*/
+  CONFIG_DETAIL_URI: 'system/config/detail',
+  CONFIG_LIST_URI: 'system/config/list',
+  CONFIG_REMOVE_URI: 'system/config/delete',
+  CONFIG_ADD_URI: 'system/config/add',
+  CONFIG_EDIT_URI: 'system/config/edit',
   /*===数据字典管理===*/
   DICT_DETAIL_URI: 'system/dict/type/detail',
   DICT_LIST_URI: 'system/dict/type/list',

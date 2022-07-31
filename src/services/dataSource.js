@@ -11,7 +11,22 @@ const dataSource = {
   roleList: async (params) => {
     return request(API.ROLE_LIST_URI, METHOD.POST, params)
   },
-
+  /** 配置 */
+  configDetail: async (params) => {
+    return request(API.CONFIG_DETAIL_URI, METHOD.POST, params)
+  },
+  configList: async (params) => {
+    return request(API.CONFIG_LIST_URI, METHOD.POST, params)
+  },
+  configRemove(params) {
+    return request(API.CONFIG_REMOVE_URI, METHOD.POST, params)
+  },
+  configEdit(params) {
+    return request(API.CONFIG_EDIT_URI, METHOD.POST, params)
+  },
+  configAdd(params) {
+    return request(API.CONFIG_ADD_URI , METHOD.POST, params)
+  },
   /*数据字典*/
   dictDetail: async (params) => {
     return request(API.DICT_DETAIL_URI, METHOD.POST, params)

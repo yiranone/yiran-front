@@ -76,3 +76,19 @@ export async function blobValidate (data) {
         return true
     }
 }
+
+// 添加日期范围
+export function addDateRange (params, dateRange, propName) {
+    var search = params
+    search.params = {}
+    if (dateRange !== null && dateRange !== '' && dateRange.length === 2) {
+        if (typeof (propName) === 'undefined') {
+            search.params['beginTime'] = dateRange[0]
+            search.params['endTime'] = dateRange[1]
+        } else {
+            search.params[propName + 'BeginTime'] = dateRange[0]
+            search.params[propName + 'EndTime'] = dateRange[1]
+        }
+    }
+    return search
+}
