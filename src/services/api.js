@@ -29,6 +29,11 @@ module.exports = {
   PERM_ADD_URI: 'system/perm/add',
   PERM_EDIT_URI: 'system/perm/edit',
   /*===配置管理===*/
+  OPERATE_LOG_DETAIL_URI: 'system/operate/log/detail',
+  OPERATE_LOG_LIST_URI: 'system/operate/log/list',
+  OPERATE_LOG_REMOVE_URI: 'system/operate/log/remove',
+  OPERATE_LOG_CLEAN_URI: 'system/operate/log/clean',
+  /*===配置管理===*/
   CONFIG_DETAIL_URI: 'system/config/detail',
   CONFIG_LIST_URI: 'system/config/list',
   CONFIG_REMOVE_URI: 'system/config/delete',

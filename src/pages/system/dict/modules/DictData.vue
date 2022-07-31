@@ -90,9 +90,8 @@ export default {
       // 状态数据字典
       statusOptions: [],
       queryParam: {
-        dictName: undefined,
-        dictType: undefined,
-        status: undefined
+        dictId: undefined,
+        dictType: undefined
       },
       columns: [
         {
@@ -149,7 +148,7 @@ export default {
   filters: {
   },
   created () {
-    this.queryParam.dictType = this.dictType
+    this.queryParam.dictId = this.dictId
     this.getList()
     metadataSource.dictListByType('system_normal_disable').then(data => {
       this.statusOptions = data
@@ -180,9 +179,7 @@ export default {
     resetQuery () {
       this.dateRange = []
       this.queryParam = {
-        dictName: undefined,
-        dictType: undefined,
-        status: undefined
+        dictType: undefined
       }
       this.handleQuery()
     },

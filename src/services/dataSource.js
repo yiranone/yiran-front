@@ -11,6 +11,20 @@ const dataSource = {
   roleList: async (params) => {
     return request(API.ROLE_LIST_URI, METHOD.POST, params)
   },
+
+  /** 操作日志 */
+  operateLogDetail: async (params) => {
+    return request(API.OPERATE_LOG_DETAIL_URI, METHOD.POST, params)
+  },
+  operateLogList: async (params) => {
+    return request(API.OPERATE_LOG_LIST_URI, METHOD.POST, params)
+  },
+  operateLogRemove(params) {
+    return request(API.OPERATE_LOG_REMOVE_URI, METHOD.POST, params)
+  },
+  operateLogClean(params) {
+    return request(API.OPERATE_LOG_CLEAN_URI, METHOD.POST, params)
+  },
   /** 配置 */
   configDetail: async (params) => {
     return request(API.CONFIG_DETAIL_URI, METHOD.POST, params)

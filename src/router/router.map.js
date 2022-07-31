@@ -88,6 +88,11 @@ const routerMap = {
     path: 'config',
     component: () => import('@/pages/system/config')
   },
+  operateLog: {
+    name: '系统参数',
+    path: 'operateLog',
+    component: () => import('@/pages/system/operateLog')
+  },
   dict: {
     name: '数据字典',
     path: 'dict',

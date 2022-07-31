@@ -8,26 +8,33 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="字典名称">
-                <a-input v-model="queryParam.dictName" placeholder="请输入字典名称" allow-clear/>
+              <a-form-item label="系统模块">
+                <a-input v-model="queryParam.title" placeholder="请输入系统模块" allow-clear/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="字典类型">
-                <a-input v-model="queryParam.dictType" placeholder="请选择字典类型" allow-clear/>
+              <a-form-item label="操作人员">
+                <a-input v-model="queryParam.operName" placeholder="请输入操作人员" allow-clear/>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
               <a-col :md="8" :sm="24">
-                <a-form-item label="状态">
-                  <a-select placeholder="字典状态" v-model="queryParam.status" style="width: 100%">
-                    <a-select-option v-for="(d, index) in statusOptions" :key="index" :value="d.value">{{ d.label }}</a-select-option>
+                <a-form-item label="类型">
+                  <a-select placeholder="操作类型" v-model="queryParam.businessType" style="width: 100%" allow-clear>
+                    <a-select-option v-for="(d, index) in typeOptions" :key="index" :value="d.dictValue">{{ d.dictLabel }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
               <a-col :md="8" :sm="24">
-                <a-form-item label="创建时间">
-                  <a-range-picker style="width: 100%" v-model="dateRange" valueFormat="YYYY-MM-DD" format="YYYY-MM-DD" />
+                <a-form-item label="状态">
+                  <a-select placeholder="操作状态" v-model="queryParam.status" style="width: 100%" allow-clear>
+                    <a-select-option v-for="(d, index) in statusOptions" :key="index" :value="d.dictValue">{{ d.dictLabel }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="操作时间">
+                  <a-range-picker style="width: 100%" v-model="dateRange" valueFormat="YYYY-MM-DD" format="YYYY-MM-DD" allow-clear/>
                 </a-form-item>
               </a-col>
             </template>
@@ -46,21 +53,15 @@
       </div>
       <!-- 操作 -->
       <div class="table-operations">
-        <a-button type="primary" @click="$refs.createForm.handleAdd()" v-hasPermi="['system:dict:add']">
-          <a-icon type="plus" />新增
-        </a-button>
-        <a-button type="primary" :disabled="single" @click="$refs.createForm.handleUpdate(undefined, ids)" v-hasPermi="['system:dict:edit']">
-          <a-icon type="edit" />修改
-        </a-button>
-        <a-button type="danger" :disabled="multiple" @click="handleDelete" v-hasPermi="['system:dict:remove']">
+        <a-button type="danger" :disabled="multiple" @click="handleDelete" v-hasPermi="['monitor:operlog:remove']">
           <a-icon type="delete" />删除
         </a-button>
-        <a-button type="primary" @click="handleExport" v-hasPermi="['system:dict:export']">
+        <a-button type="danger" @click="handleClean" v-hasPermi="['monitor:operlog:remove']">
+          <a-icon type="delete" />清空
+        </a-button>
+        <a-button type="primary" @click="handleExport" v-hasPermi="['system:config:export']">
           <a-icon type="download" />导出
         </a-button>
-<!--        <a-button type="dashed" :loading="refreshing" @click="handleRefreshCache" v-hasPermi="['system:dict:remove']">
-          <a-icon type="redo" />刷新缓存
-        </a-button>-->
         <table-setting
           :style="{float: 'right'}"
           :table-size.sync="tableSize"
@@ -68,41 +69,29 @@
           :refresh-loading="loading"
           @refresh="getList" />
       </div>
-      <!-- 增加修改 -->
-      <create-form
-        ref="createForm"
-        :statusOptions="statusOptions"
-        @ok="getList"
-      />
-      <a-table :size="tableSize"
+      <!-- 详细信息 -->
+      <view-form ref="viewForm" />
+      <!-- 数据展示 -->
+      <a-table
         :loading="loading"
-        rowKey="dictId"
+        :size="tableSize"
+        rowKey="operateId"
         :columns="columns"
-        :expandedRowKeys="expandedKeys"
-        @expand="onExpandCurrent"
         :data-source="list"
-        @change="onSortChange"
         :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-        :pagination="false" :bordered="tableBordered">
-        <span
-          slot="expandedRowRender"
-          slot-scope="text">
-          <dict-data
-            ref="dictData"
-            :dictId="text.dictId"
-            :dictType="text.dictType"
-          />
+        :pagination="false"
+        :bordered="tableBordered"
+        @change="onSortChange"
+      >
+        <span slot="businessType" slot-scope="text, record">
+          {{ typeFormat(record) }}
         </span>
         <span slot="status" slot-scope="text, record">
           {{ statusFormat(record) }}
         </span>
         <span slot="operation" slot-scope="text, record">
-          <a @click="$refs.createForm.handleUpdate(record, undefined)" v-hasPermi="['system:dict:edit']">
-            <a-icon type="edit" />修改
-          </a>
-          <a-divider type="vertical" />
-          <a @click="handleDelete(record)" v-hasPermi="['system:dict:remove']">
-            <a-icon type="delete" />删除
+          <a @click="$refs.viewForm.handleView(record)" v-hasPermi="['monitor:operlog:query']">
+            <a-icon type="eye" />详细
           </a>
         </span>
       </a-table>
@@ -125,17 +114,15 @@
 <script>
 
 import {dataSource,metadataSource} from '@/services/index'
-import CreateForm from './modules/CreateForm'
-import DictData from './modules/DictData'
+import ViewForm from './modules/ViewForm'
 import { tableMixin } from '@/store/table-mixin'
 import PageLayout from "@/layouts/PageLayout";
 
 export default {
-  name: 'Dict',
+  name: 'OperateLog',
   components: {
-    PageLayout,
-    CreateForm,
-    DictData,
+    ViewForm,
+    PageLayout
   },
   mixins: [tableMixin],
   data () {
@@ -145,68 +132,76 @@ export default {
       selectedRows: [],
       // 高级搜索 展开/关闭
       advanced: false,
-      // 非单个禁用
-      single: true,
+      loading: false,
       // 非多个禁用
       multiple: true,
-      ids: [],
-      loading: false,
-      refreshing: false,
       total: 0,
       // 状态数据字典
       statusOptions: [],
+      typeOptions: [],
       // 日期范围
       dateRange: [],
       queryParam: {
         pageNum: 1,
         pageSize: 10,
-        dictName: undefined,
-        dictType: undefined,
+        title: undefined,
+        operateName: undefined,
+        businessType: undefined,
         status: undefined
       },
-      expandedKeys: [],
       columns: [
         {
-          title: '字典编号',
-          sorter: true,
-          dataIndex: 'dictId',
+          title: '日志编号',
+          dataIndex: 'operateId',
           align: 'center'
         },
         {
-          title: '字典名称',
-          sorter: true,
-          dataIndex: 'dictName',
-          ellipsis: true,
+          title: '系统模块',
+          dataIndex: 'title',
           align: 'center'
         },
         {
-          title: '字典类型',
-          dataIndex: 'dictType',
-          ellipsis: true,
+          title: '操作类型',
+          dataIndex: 'businessType',
+          scopedSlots: { customRender: 'businessType' },
           align: 'center'
         },
         {
-          title: '状态',
+          title: '请求方式',
+          dataIndex: 'requestMethod',
+          align: 'center'
+        },
+        {
+          title: '操作人员',
+          dataIndex: 'operateName',
+          align: 'center',
+          sorter: true
+        },
+        {
+          title: '主机',
+          dataIndex: 'operateIp',
+          align: 'center'
+        },
+        {
+          title: '操作地点',
+          dataIndex: 'operateLocation',
+          align: 'center'
+        },
+        {
+          title: '结果',
           dataIndex: 'status',
           scopedSlots: { customRender: 'status' },
           align: 'center'
         },
         {
-          title: '备注',
-          dataIndex: 'remark',
-          ellipsis: true,
-          align: 'center'
-        },
-        {
-          title: '创建时间',
-          dataIndex: 'createTime',
-          ellipsis: true,
-          align: 'center'
+          title: '操作日期',
+          dataIndex: 'operateTime',
+          align: 'center',
+          sorter: true
         },
         {
           title: '操作',
           dataIndex: 'operation',
-          width: '15%',
           scopedSlots: { customRender: 'operation' },
           align: 'center'
         }
@@ -217,8 +212,11 @@ export default {
   },
   created () {
     this.getList()
-    metadataSource.dictListByType('system_normal_disable').then(response => {
-      this.statusOptions = response
+    metadataSource.dictListByType('system_common_status').then(data => {
+      this.statusOptions = data
+    })
+    metadataSource.dictListByType('system_operate_type').then(data => {
+      this.typeOptions = data
     })
   },
   computed: {
@@ -226,20 +224,23 @@ export default {
   watch: {
   },
   methods: {
-    /** 查询字典列表 */
+    /** 查询登录日志列表 */
     getList () {
       this.loading = true
-      dataSource.dictList({...this.queryParam}).then(res => {
-        const {rows, count} = res
-          this.list = rows
-          this.total = count
+      dataSource.operateLogList(this.addDateRange(this.queryParam, this.dateRange)).then(data => {
+          this.list = data.rows
+          this.total = data.count
           this.loading = false
         }
       )
     },
-    // 参数系统内置字典翻译
-    statusFormat (row) {
+    // 操作日志状态字典翻译
+    statusFormat (row, column) {
       return this.selectDictLabel(this.statusOptions, row.status)
+    },
+    // 操作日志类型字典翻译
+    typeFormat (row, column) {
+      return this.selectDictLabel(this.typeOptions, row.businessType)
     },
     /** 搜索按钮操作 */
     handleQuery () {
@@ -252,8 +253,9 @@ export default {
       this.queryParam = {
         pageNum: 1,
         pageSize: 10,
-        dictName: undefined,
-        dictType: undefined,
+        title: undefined,
+        operateName: undefined,
+        businessType: undefined,
         status: undefined
       }
       this.handleQuery()
@@ -278,8 +280,7 @@ export default {
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
-      this.ids = this.selectedRows.map(item => item.dictId)
-      this.single = selectedRowKeys.length !== 1
+      this.ids = this.selectedRows.map(item => item.operateId)
       this.multiple = !selectedRowKeys.length
     },
     toggleAdvanced () {
@@ -288,16 +289,33 @@ export default {
     /** 删除按钮操作 */
     handleDelete (row) {
       var that = this
-      const dictIds = row.dictId ? [row.dictId] : this.ids
+      const operateIds = row.operateId != null ? [row.operateId] : this.ids
       this.$confirm({
         title: '确认删除所选中数据?',
-        content: '当前选中字典编号为' + dictIds + '的数据',
+        content: '当前选中日志编号为' + operateIds + '的数据',
         onOk () {
-          return dataSource.dictRemove({"dictIds":dictIds})
+          return dataSource.operateLogRemove({operateIds:operateIds})
             .then(() => {
               that.onSelectChange([], [])
               that.getList()
-              that.$message.success('删除成功' )
+              that.$message.success('删除成功')
+          })
+        },
+        onCancel () {}
+      })
+    },
+    /** 清空按钮操作 */
+    handleClean () {
+      var that = this
+      this.$confirm({
+        title: '是否确认清空?',
+        content: '此操作将会清空所有操作日志数据项',
+        onOk () {
+          return dataSource.operateLogClean()
+            .then(() => {
+              that.onSelectChange([], [])
+              that.getList()
+              that.$message.success('清空成功')
           })
         },
         onCancel () {}
@@ -310,28 +328,12 @@ export default {
         title: '是否确认导出?',
         content: '此操作将导出当前条件下所有数据而非选中数据',
         onOk () {
-          that.download('system/dict/type/export', {
+          that.download('system/operate/log/export', {
             ...that.queryParam
-          }, `字典类型${new Date().getTime()}.xlsx`)
+          }, `操作日志_${new Date().getTime()}.xlsx`)
         },
         onCancel () {}
       })
-    },
-    /** 清理缓存按钮操作 */
-    handleRefreshCache () {
-      this.refreshing = true
-      // refreshCache().then(() => {
-      //   this.$message.success('刷新成功')
-      // }).finally(() => {
-      //   this.refreshing = false
-      // })
-    },
-    onExpandCurrent (expandedKeys, row) {
-      if (expandedKeys) {
-        this.expandedKeys = [row.dictId]
-      } else {
-        this.expandedKeys = []
-      }
     }
   }
 }

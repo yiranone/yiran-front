@@ -95,8 +95,8 @@ export default {
     handleUpdate (row, ids) {
       this.reset()
       const dictId = row ? row.dictId : ids[0]
-      dataSource.dictDetail({dictId:dictId}).then(response => {
-        this.form = response
+      dataSource.dictDetail({dictId:dictId}).then(data => {
+        this.form = data
         this.open = true
         this.formTitle = '修改字典类型'
       })
@@ -108,21 +108,15 @@ export default {
           this.submitLoading = true
           if (this.form.dictId !== undefined) {
             dataSource.dictEdit(this.form).then(response => {
-              this.$message.success(
-                '修改成功',
-                3
-              )
+              this.$message.success('修改成功')
               this.open = false
               this.$emit('ok')
             }).finally(() => {
               this.submitLoading = false
             })
           } else {
-            dataSource.dictAdd(this.form).then(response => {
-              this.$message.success(
-                '新增成功',
-                3
-              )
+            dataSource.dictAdd(this.form).then(data => {
+              this.$message.success('新增成功')
               this.open = false
               this.$emit('ok')
             }).finally(() => {
