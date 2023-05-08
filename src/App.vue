@@ -6,7 +6,7 @@
 
 <script>
   import {enquireScreen} from './utils/util'
-  import {mapState, mapMutations, mapActions} from 'vuex'
+  import {mapGetters ,mapState, mapMutations, mapActions} from 'vuex'
   import themeUtil from '@/utils/themeUtil';
   import {getI18nKey} from '@/utils/routerUtil'
 
@@ -19,6 +19,7 @@
     },
     created() {
       this.setHtmlTitle()
+      console.info("设置默认语言:"+this.lang)
       this.setLanguage(this.lang)
       enquireScreen(isMobile => this.setDevice(isMobile))
     },
@@ -49,7 +50,8 @@
       }
     },
     computed: {
-      ...mapState('setting', ['theme', 'weekMode', 'lang'])
+      ...mapState('setting', ['theme', 'weekMode']),
+      ...mapGetters('setting', ['lang']),
     },
     methods: {
       ...mapMutations('setting', ['setDevice']),

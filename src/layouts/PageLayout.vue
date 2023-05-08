@@ -92,7 +92,6 @@ export default {
       let routes = this.$route.matched
       const path = this.$route.path
       let breadcrumb = []
-      //debugger
       // routes.filter(item => path.includes(item.path))
       routes
         .forEach(route => {

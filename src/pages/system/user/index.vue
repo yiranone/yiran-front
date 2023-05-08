@@ -1,93 +1,164 @@
 <template>
   <page-layout title=" ">
     <div slot="headerContent">
-      <query :conditions="conditions" @onQuery="onQuery" :loading="loading"/>
     </div>
-    <a-card :id="id">
-      <div class="flex space-between">
-        <div>
-          <a-button type="primary" @click="addRecord" style="margin-right: 5px">
-            <a-icon type="plus"/>
-            新增
-          </a-button>
-          <a-button type="danger"
-                    :disabled="delets.length == 0"
-                    :loading="batchDeleteLoading"
-                    v-auth="`delete`"
-                    @click="deleteRecord('batch')">
-            <a-icon type="delete"/>
-            批量删除
-          </a-button>
-        </div>
-        <type-set :colSize="colSize" @changeSize="changeSize" :elId="id" @refresh="onRefresh"/>
+    <a-card>
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="登录名">
+                <a-input v-model="queryParam.loginName" placeholder="" allow-clear/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="手机号">
+                <a-input v-model="queryParam.phoneNumber" placeholder="" allow-clear/>
+              </a-form-item>
+            </a-col>
+            <template v-if="advanced">
+              <a-col :md="8" :sm="24">
+                <a-form-item label="用户ID">
+                  <a-input v-model="queryParam.userId" placeholder="" allow-clear/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="用户名称">
+                  <a-input v-model="queryParam.userName" placeholder="" allow-clear/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="部门">
+                  <a-tree-select
+                      v-model="queryParam.deptId"
+                      :tree-data="deptOptions"
+                      placeholder=""
+                      :replaceFields="replaceFields"
+                      :treeExpandedKeys.sync="deptTreeExpandedKeys"
+                      allowClear/>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="状态">
+                  <a-select placeholder="请选择" v-model="queryParam.status" style="width: 100%" allow-clear>
+                    <a-select-option v-for="(d, index) in this.$store.getters.system_user_status" :key="index" :value="d.value">{{ d.label }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+              <a-col :md="8" :sm="24" v-if="hasPermission('system:role:view')">
+                <a-form-item label="角色">
+                  <a-select placeholder="请选择" v-model="queryParam.roleId" :filterOption="filterOption" :showSearch="true" style="width: 100%" allow-clear>
+                    <a-select-option v-for="(d, index) in roleList" :key="index" :value="d.roleId"> {{ d.roleName }}</a-select-option>
+                  </a-select>
+                </a-form-item>
+              </a-col>
+            </template>
+            <a-col :md="!advanced && 8 || 24" :sm="24">
+              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+                <a-button type="primary" @click="handleQuery"><a-icon type="search" />查询</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />重置</a-button>
+                <a @click="toggleAdvanced" style="margin-left: 8px">
+                  {{ advanced ? '收起' : '展开' }}
+                  <a-icon :type="advanced ? 'up' : 'down'"/>
+                </a>
+              </span>
+            </a-col>
+          </a-row>
+        </a-form>
       </div>
+      <!-- 操作 -->
+      <div class="table-operations">
+        <a-button type="primary" @click="$refs.createForm.handleAdd()" v-hasPerm="['system:user:add']">
+          <a-icon type="plus" />新增
+        </a-button>
+        <a-button type="danger" :disabled="!isSelected" @click="handleDelete" v-hasPerm="['system:user:delete']">
+          <a-icon type="delete" />删除
+        </a-button>
+        <table-setting
+            :style="{float: 'right'}"
+            :table-size.sync="tableSize"
+            v-model="columns"
+            :refresh-loading="loading"
+            @refresh="getList" />
+      </div>
+
       <standard-table
           :columns="columns"
-          :dataSource="dataSource"
-          :col-size="colSize"
+          :dataSource="list"
+          :size="tableSize"
           rowKey="userId"
           :loading="loading"
-          :scroll="{ x: '100%'}"
-          :pagination="{
-            current: pageNum,
-            pageSize: pageSize,
-            total: total,
-            showSizeChanger: true,
-            showLessItems: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => `总计 ${total} 条`
-          }"
-          :selectedRows.sync="selectedRows"
-          :getCheckboxProps="record => ({
-            props: {
-              disabled: record.admin
-            }
-          })"
-          @change="onChange"
-          @selectedRowChange="onSelectChange"
+          :total="total"
+          :showSelectInfo='false'
+          :showRowSelection='true'
+          :selectedRowKeys='selectedRowKeys'
+          :selectedRows='selectedRows'
+          :pageNum="pageNum"
+          :pageSize="pageSize"
+          :pageSizeOptions="pageSizeOptions"
+          :sortChange="onSortChange"
+          :selectedRowChange="onSelectChange"
+          :pageSizeChange="onPageSizeChange"
+          :pageNumChange="onPageNumChange"
       >
-        <template slot="status" slot-scope="{text}">
-          <a-tag :color="text == '1' ? 'red' : 'green'">{{text | statusStr}}</a-tag>
+        <template slot="avatar" slot-scope="{text}">
+          <a-avatar :src="text" :size="26" icon="user"></a-avatar>
+        </template>
+        <template slot="roleNames" slot-scope="{text}">
+          <a-tag color="blue" v-for="(item) in text" :key="item">{{item}}</a-tag>
+        </template>
+        <template slot="status" slot-scope="{text,record}">
+          <span v-html="statusStr(text)"></span>
+          <a-icon v-if="record.isLock" type="lock" theme="twoTone" two-tone-color="red"/>
         </template>
         <template slot="time" slot-scope="{text, record}">
           {{record | timeStr}}
         </template>
         <template slot="action" slot-scope="{text, record}">
-          <a class="action-editor" :class="{'disabled': record.admin}" style="margin-right: 8px" @click="editRecord(record)">
+          <a class="action-editor" v-if="hasPermission('system:user:edit')" :class="{'disabled': record.admin}" style="margin-right: 8px" @click="$refs.createForm.handleUpdate(record, undefined)">
             <a-icon type="edit"/>
             编辑
           </a>
-          <a class="action-rest" :class="{'disabled': record.admin}" style="margin-right: 8px" @click="resetPwd(record)">
-            <a-icon type="key"/>
-            重置密码
-          </a>
-          <a-popconfirm
-              v-if="dataSource.length && !record.admin"
-              title="确认删除?"
-              @confirm="() => deleteRecord(record.userId)"
-          >
-            <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
-              <a-icon type="delete"/>
-              删除
+          <a-divider type="vertical" v-if="hasPermission('system:user:resetPwd') || hasPermission('system:user:unlock') && record.isLock"/>
+          <a-dropdown v-if="hasPermission('system:user:resetPwd') || hasPermission('system:user:unlock') && record.isLock">
+            <a class="ant-dropdown-link" @click="e => e.preventDefault()">
+              更多操作 <a-icon type="down" />
             </a>
-          </a-popconfirm>
+            <a-menu slot="overlay">
+              <a-menu-item v-if="hasPermission('system:user:resetPwd')">
+                <a @click="$refs.resetPasswordForm.handleResetPwd(record)" >
+                  <a-icon type="key" />重置密码
+                </a>
+              </a-menu-item>
+              <a-menu-item v-if="hasPermission('system:user:unlock') && record.isLock">
+                <a @click="unlock(record)">
+                  <a-icon type="unlock" />解锁用户
+                </a>
+              </a-menu-item>
+            </a-menu>
+          </a-dropdown>
         </template>
       </standard-table>
-      <m-form @success="mFormSuccess"/>
-<!--      <m-reset-pwd />-->
+      <m-form ref="createForm" :deptOptions="deptOptions"
+                :statusOptions="statusOptions"
+                :sexOptions="sexOptions"
+                :channelOptions="channelOptions"
+                :roleList="roleList"
+              @ok="getList"/>
+      <reset-password ref="resetPasswordForm"/>
     </a-card>
   </page-layout>
 </template>
 
 <script>
   import PageLayout from '@/layouts/PageLayout'
-  import Query from './query'
-  import StandardTable from '../../../components/table/StandardTable'
-  import TypeSet from '../../common/type-set'
-  import MForm from './m-form'
-  import {dataSource as ds} from '../../../services/index'
-  import {userService as us} from '../../../services/index'
-  import {handleTree} from "../../../utils/util";
+  import StandardTable from '@/components/table/StandardTable'
+  import { tableMixin } from '@/store/table-mixin'
+
+  import MForm from './user-form'
+  import ResetPassword from "./reset-password";
+  import {dataSource, metadataSource as ms} from '@/services/index'
+  import {mapGetters} from "vuex";
 
   const columns = [
     {
@@ -97,112 +168,160 @@
       align: 'center',
       width: 80
     }, {
+      title: '头像',
+      dataIndex: 'avatar',
+      align: 'center',
+      width: 90,
+      scopedSlots: {customRender: 'avatar'}
+    },{
       title: '登录账号',
       dataIndex: 'loginName',
+      sorter: true,
       align: 'center',
       width: 90
     }, {
       title: '用户名称',
       dataIndex: 'userName',
+      sorter: true,
       align: 'center',
       width: 90
     }, {
       title: '手机',
       dataIndex: 'phoneNumber',
+      sorter: true,
       align: 'center',
       width: 100
     }, {
+      title: '邮箱',
+      dataIndex: 'email',
+      sorter: true,
+      align: 'center',
+      width: 100
+    },{
+      title: '部门',
+      dataIndex: 'deptName',
+      sorter: true,
+      align: 'center',
+      width: 100
+    }, {
+      title: '角色',
+      dataIndex: 'roleNames',
+      align: 'left',
+      ellipsis: true,
+      width: 120,
+      scopedSlots: {customRender: 'roleNames'}
+    }, {
       title: '状态',
       dataIndex: 'status',
+      sorter: true,
       align: 'center',
       width: 80,
       scopedSlots: {customRender: 'status'}
     }, {
+      title: '登录时间',
+      dataIndex: 'loginDate',
+      align: 'center',
+      sorter: true,
+      width: 180
+    }, {
+      title: '创建时间',
+      dataIndex: 'createTime',
+      align: 'center',
+      sorter: true,
+      width: 180,
+      scopedSlots: {customRender: 'time'}
+    }, {
       title: '更新时间',
       dataIndex: 'updateTime',
       align: 'center',
+      hidden: true,
       sorter: true,
-      width: 100,
+      width: 180,
       scopedSlots: {customRender: 'time'}
     }, {
       title: '修改人',
-      dataIndex: 'createBy',
+      dataIndex: 'updateBy',
+      sorter: true,
+      hidden: true,
       align: 'center',
       width: 80
     }, {
       title: '操作',
+      dataIndex: 'operation',
       scopedSlots: {customRender: 'action'},
       align: 'center',
-      width: 220,
+      width: 180,
     }
   ]
 
   export default {
-    components: {PageLayout, Query, StandardTable, TypeSet, MForm},
+    components: {PageLayout, StandardTable, MForm, ResetPassword},
+    mixins: [tableMixin],
     data() {
       return {
-        id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
-        loading: false,
-        colSize: 'middle',
-        columns: columns,
-        dataSource: [],
-        conditions: {}, //查询条件
+        list: [],
         total: 0,
-        pageSize: 10,
-        pageNum: 1,
-        formVisible: false,
-        formType: '新增',
-        formMenuType: 'M',
-        initialValue: {},
-        selectedRows: [],
+        loading: false,
+        columns: columns,
+
+        // 状态数据字典
+        channelOptions: [],
+        statusOptions: [],
+        sexOptions: [],
+        // 部门树选项
+        deptOptions: [],
         roleList: [],
-        delets: [],
-        batchDeleteLoading: false,
-        resetPwdVisible: false
+        replaceFields: {
+          key: 'id',
+          value: 'id',
+          title: 'name'
+        },
+        deptTreeExpandedKeys: [1],
       }
     },
 
-    provide() {
-      return {
-        parent: this
-      }
+    created() {
+      this.getRoleList()
+      this.getChannelList()
+      this.getDeptTree()
+      this.statusOptions = this.$store.getters.system_user_status
+      this.getList()
+    },
+
+    computed: {
     },
 
     filters: {
-      statusStr(val) {
-        switch (val) {
-          case '1':
-            return '停用'
-          case '0':
-            return '正常'
-          default:
-            return '正常'
-        }
-      },
       timeStr(val) {
         return val.updateTime || val.createTime || '-'
       }
     },
 
-    created() {
-      this.getList()
-      this.getRoleList()
-    },
-
-    beforeRouteLeave(to, from, next) {
-      this.formVisible = false
-      next()
-    },
-
+    // beforeRouteLeave(to, from, next) {
+    //   this.formVisible = false
+    //   next()
+    // },
 
     methods: {
+      statusStr(val) {
+        return this.selectDictLabel(this.statusOptions, val)
+      },
+      filterOption(input, option) {
+        return (
+            option.componentOptions.children[0].text.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        );
+      },
+      showDropMenu(row){
+        const hasReset = this.hasPermission('system:user:resetPwd')
+        const hasUnlock = this.hasPermission('system:user:unlock')
+        return hasReset || (row.isLock && hasUnlock)
+      },
       /*获取数据列表*/
       getList() {
         this.loading = true
-        const {pageNum, pageSize, conditions} = this
-        ds.userList({pageNum, pageSize, ...conditions}).then(res => {
+        dataSource.userList(this.queryParam).then(res => {
           const {rows, count} = res
-          this.dataSource = rows
+          this.list = rows
           this.total = count
           this.loading = false
         }).catch(res => {
@@ -212,111 +331,63 @@
 
       /*获取角色列表*/
       getRoleList() {
-        ds.roleList({pageNum: 1, pageSize: 100}).then(res => {
-          const {rows, count} = res
-          this.roleList = rows
-        })
-      },
-      /*查询*/
-      onQuery(conditions) {
-        this.conditions = {...this.conditions, ...conditions}
-        this.getList()
-      },
-
-      /*表格搜索条件改变查询*/
-      onChange(pagination, filters, sorter, {currentDataSource}) {
-        this.pageNum = pagination.current
-        this.pageSize = pagination.pageSize
-        this.conditions = {
-          ...this.conditions,
-          orderByColumn: sorter.columnKey,
-          orderDirection: sorter.order ? sorter.order == 'ascend' ? 'ASC' : 'DESC' : undefined
-        }
-        this.getList()
-      },
-
-      /*type刷新*/
-      onRefresh() {
-        this.pageNum = 1
-        this.conditions = {}
-        this.pageSize = 10
-        this.getList()
-      },
-
-      /*选中行改变触发*/
-      onSelectChange(selectedRowKeys, selectedRows) {
-        this.delets = [...selectedRowKeys]
-      },
-
-      /*列表行高改变*/
-      changeSize(key) {
-        this.colSize = key
-      },
-
-      /*新增*/
-      addRecord() {
-        this.formType = '新增'
-        this.formVisible = true
-      },
-
-      /*编辑*/
-      editRecord(record) {
-        this.formType = '编辑'
-        this.initialValue = {...record}
-        this.formVisible = true
-      },
-
-      /*重置密码*/
-      resetPwd(record) {
-        this.formType = '重置'
-        this.initialValue = {...record}
-        this.formVisible = true
-      },
-
-      /*删除*/
-      async deleteRecord(id) {
-        this.loading = true
-        if (id === 'batch') this.batchDeleteLoading = true;
-        let delets = id === 'batch' ? this.delets : [id]
-        await us.deleteUser({ids: delets}).then(res => {
-          this.$message.success('删除成功')
-          this.dataSource = this.dataSource.filter(item => {
-            return !this.delets.includes(item.roleId)
+        const hasRole = this.hasPermission('system:role:view')
+        if(hasRole) {
+          dataSource.roleList({pageNum: 1, pageSize: 1000}).then(res => {
+            const {rows, count} = res
+            this.roleList = rows
           })
-          this.total = this.total - this.delets.length
-        }).catch(res => {
-        })
-        this.loading = false
-        this.batchDeleteLoading = false
-      },
-
-      mFormSuccess(res) {
-        this.formVisible = false
-        if (this.formType == '新增') {
-          this.dataSource = [res, ...this.dataSource]
-          this.total++
         } else {
-          this.dataSource = this.dataSource.map(item => {
-            if (item.userId == res.userId) {
-              item = {...res}
-            }
-            return item
-          })
+          this.roleList = []
         }
+      },
+      getChannelList () {
+        ms.channelAll().then(data => {
+          this.channelOptions = data
+        })
+      },
+
+      getDeptTree () {
+        ms.deptTree().then(data => {
+          this.deptOptions = data
+        })
+      },
+      /** 解锁用户 */
+      unlock (row) {
+        var that = this
+        this.$confirm({
+          title: '确认解锁用户?',
+          content: '当前选中用户为' + row.loginName + '',
+          onOk () {
+            return dataSource.userUnlock({userId:row.userId})
+                .then(() => {
+                  that.getList()
+                  that.$message.success('解锁成功')
+                }).finally(()=>{
+                })
+          },
+          onCancel () {}
+        })
+      },
+      /** 删除按钮操作 */
+      handleDelete (row) {
+        var that = this
+        const selectedIds = row.userId ?  [row.userId] : this.selectedRowKeys
+        this.$confirm({
+          title: '确认删除所选中数据?',
+          content: '当前选中编号为' + selectedIds + '的数据',
+          onOk () {
+            return dataSource.userDelete({userIds:selectedIds})
+                .then(() => {
+                  that.onSelectChange([], [])
+                  that.getList()
+                  that.$message.success('删除成功')
+                }).finally(()=>{
+                })
+          },
+          onCancel () {}
+        })
       }
     }
   }
 </script>
-
-<style lang="less" scoped>
-  /deep/ .page-header .page-header-wide .detail .main .content {
-    width: 100%;
-    > div {
-      width: 100%;
-    }
-  }
-
-  /deep/ .ant-tag {
-    margin-right: 0;
-  }
-</style>

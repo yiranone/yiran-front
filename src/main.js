@@ -1,24 +1,20 @@
 import Vue from 'vue'
 import App from './App.vue'
-import {initRouter} from './router'
-import './theme/index.less'
+import {router} from '@/router'
+import 'ant-design-vue/dist/antd.less';
 import Antd from 'ant-design-vue'
-import 'ant-design-vue/dist/antd.css';
 import Viser from 'viser-vue'
-import '@/mock'
 import store from './store'
 import 'animate.css/source/animate.css'
 import Plugins from '@/plugins'
 import {initI18n} from '@/utils/i18n'
 import bootstrap from '@/bootstrap'
 import "@/plugins/svg-icon-plugin";
-import 'moment/locale/zh-cn'
 import aLink from '@/components/a-link'
 
-if (process.env.NODE_ENV === 'development') require('@/mock');
+import './core/init' //加载一些组件
 
-const router = initRouter(store.state.setting.asyncRoutes)
-console.info("前端初始化目录:" + JSON.stringify(router.options.routes))
+console.info("main.js前端初始化目录,未加载后台目录之前:" + JSON.stringify(router.options.routes))
 
 const i18n = initI18n('CN', 'US')
 
@@ -28,6 +24,7 @@ Vue.use(Viser)
 Vue.use(Plugins)
 Vue.use(aLink)
 
+//加载后台 用户，菜单，权限等等
 bootstrap({router, store, i18n, message: Vue.prototype.$message})
 
 new Vue({

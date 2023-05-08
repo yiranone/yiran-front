@@ -14,12 +14,12 @@
     <a-layout class="admin-layout-main beauty-scroll">
       <admin-header :class="[{'fixed-tabs': fixedTabs, 'fixed-header': fixedHeader, 'multi-page': multiPage}]" :style="headerStyle" :menuData="headMenuData" :collapsed="collapsed" @toggleCollapse="toggleCollapse"/>
       <a-layout-header :class="['virtual-header', {'fixed-tabs' : fixedTabs, 'fixed-header': fixedHeader, 'multi-page': multiPage}]" v-show="fixedHeader"></a-layout-header>
-      <a-layout-content class="admin-layout-content" :style="`min-height: ${minHeight}px;`">
+      <a-layout-content class="admin-layout-content" :style="`min-height: ${hideFooter ? minHeight  : minHeight - 122}px;`">
         <div style="position: relative">
           <slot></slot>
         </div>
       </a-layout-content>
-      <a-layout-footer style="padding: 0px">
+      <a-layout-footer style="padding: 0px" v-if="!hideFooter">
         <page-footer :link-list="footerLinks" :copyright="copyright" />
       </a-layout-footer>
     </a-layout>
@@ -41,7 +41,8 @@ export default {
   components: {Setting, SideMenu, Drawer, PageFooter, AdminHeader},
   data () {
     return {
-      minHeight: window.innerHeight - 64 - 122,
+      // minHeight: window.innerHeight - 64 - 122,
+      minHeight: window.innerHeight - 64,
       collapsed: false,
       showSetting: false,
       drawerOpen: false
@@ -67,7 +68,7 @@ export default {
   },
   computed: {
     ...mapState('setting', ['isMobile', 'theme', 'layout', 'footerLinks', 'copyright', 'fixedHeader', 'fixedSideBar',
-      'fixedTabs', 'hideSetting', 'multiPage']),
+      'fixedTabs', 'hideSetting', 'hideFooter','multiPage']),
     ...mapGetters('setting', ['firstMenu', 'subMenu', 'menuData']),
     sideMenuWidth() {
       return this.collapsed ? '80px' : '256px'
@@ -151,8 +152,8 @@ export default {
     }
     .admin-layout-content{
       padding: 24px 24px 0;
-      /*overflow-x: hidden;*/
-      /*min-height: calc(100vh - 64px - 122px);*/
+/*      overflow-x: hidden;
+      min-height: calc(100vh - 64px - 122px);*/
     }
     .setting{
       background-color: @primary-color;

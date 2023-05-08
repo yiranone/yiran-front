@@ -16,6 +16,10 @@ function initI18n(locale, fallback) {
     locale,
     fallbackLocale: fallback,
     silentFallbackWarn: true,
+    messages: {
+      'CN': require('@/lang/cn'),
+      'US': require('@/lang/us')
+    },
   }
   return new VueI18n(i18nOptions)
 }

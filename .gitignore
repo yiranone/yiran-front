@@ -1,4 +1,5 @@
 .DS_Store
+.env.development
 node_modules/
 dist/
 admindb/
@@ -17,3 +18,4 @@ selenium-debug.log
 *.njsproj
 *.sln
 *.iml
+/package-lock.json

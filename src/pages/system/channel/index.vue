@@ -1,188 +1,141 @@
 <template>
   <page-layout title="" showPageTitle="false">
-    <a-card :id="id">
-      <div :class="expand ? 'search' : null">
-        <a-form layout="horizontal" @submit="onSubmit" :form="form">
-          <div :class="expand ? null: 'fold'">
-            <a-row>
-              <a-col :xl="8" :md="24">
-                <a-form-item
-                    label="渠道名称"
-                    :labelCol="{span: 6}"
-                    :wrapperCol="{span: 17, offset: 0}"
-                >
-                  <a-input allowClear
-                           placeholder="请输入渠道名称"
-                           v-decorator="['searchChannelName']"/>
-                </a-form-item>
-              </a-col>
-              <a-col :xl="8" :md="24">
-                <a-form-item
-                    label="渠道编码"
-                    :labelCol="{span: 6}"
-                    :wrapperCol="{span: 17, offset: 0}"
-                >
-                  <a-input allowClear placeholder="" v-decorator="['searchChannelCode']"/>
-                </a-form-item>
-              </a-col>
-              <a-col :xl="8" :sm="24">
-                <a-form-item
-                    label="状态"
-                    :labelCol="{span: 6}"
-                    :wrapperCol="{span: 17, offset: 0}"
-                >
-                  <a-select allowClear placeholder="请选择" v-decorator="['searchStatus']">
-                    <a-select-option value="0">正常</a-select-option>
-                    <a-select-option value="1">停用</a-select-option>
+    <a-card>
+      <!-- 条件搜索 -->
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
+            <a-col :md="8" :sm="24">
+              <a-form-item label="渠道名称">
+                <a-input v-model="queryParam.searchChannelName" placeholder="" allow-clear/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="渠道编码">
+                <a-input v-model="queryParam.searchChannelCode" placeholder="" allow-clear/>
+              </a-form-item>
+            </a-col>
+            <template v-if="advanced">
+              <a-col :md="8" :sm="24">
+                <a-form-item label="状态">
+                  <a-select placeholder="请选择" v-model="queryParam.searchStatus" style="width: 100%" allow-clear>
+                    <a-select-option v-for="(d, index) in statusOptions" :key="index" :value="d.value">{{ d.label }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-            </a-row>
-            <a-row v-if="expand">
-              <a-col :xl="8" :sm="24">
-                <a-form-item
-                    label="到期时间大于"
-                    :labelCol="{span: 6}"
-                    :wrapperCol="{span: 17, offset: 0}"
-                >
-                  <a-date-picker style="width: 100%" placeholder="" v-decorator="['searchExpireDate1']"/>
+              <a-col :md="8" :sm="24">
+                <a-form-item label="到期时间大于">
+                  <a-date-picker v-model="queryParam.searchExpireDate1" style="width: 100%" placeholder="" />
                 </a-form-item>
               </a-col>
               <a-col :xl="8" :sm="24">
-                <a-form-item
-                    label="到期时间小于"
-                    :labelCol="{span: 6}"
-                    :wrapperCol="{span: 17, offset: 0}"
-                >
-                  <a-date-picker style="width: 100%" placeholder="" v-decorator="['searchExpireDate2']"/>
+                <a-form-item label="到期时间小于">
+                  <a-date-picker v-model="queryParam.searchExpireDate2" style="width: 100%" placeholder="" />
                 </a-form-item>
               </a-col>
-            </a-row>
-          </div>
-          <span style="float: right; margin-top: 3px;">
-          <a-button type="primary" htmlType="submit">查询</a-button>
-          <a-button style="margin-left: 8px" @click="onReset">重置</a-button>
-          <a @click="expand = !expand" style="margin-left: 8px">
-            {{ expand ? '收起' : '展开' }}
-            <a-icon :type="expand ? 'up' : 'down'"/>
-          </a>
-          </span>
+            </template>
+            <a-col :md="!advanced && 8 || 24" :sm="24">
+              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+                <a-button type="primary" @click="handleQuery"><a-icon type="search" />查询</a-button>
+                <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />重置</a-button>
+                <a @click="toggleAdvanced" style="margin-left: 8px">
+                  {{ advanced ? '收起' : '展开' }}
+                  <a-icon :type="advanced ? 'up' : 'down'"/>
+                </a>
+              </span>
+            </a-col>
+          </a-row>
         </a-form>
       </div>
-
-      <div class="">
-        <a-space class="operator">
-          <a-button type="primary" @click="addRecord">
-            <a-icon type="plus"/> 新增 </a-button>
-          <a-button type="danger"
-                    :disabled="delets.length == 0"
-                    :loading="batchDeleteLoading"
-                    v-auth="`delete`"
-                    @click="deleteRecord('batch')">
-            <a-icon type="delete"/> 删除
+      <!-- 操作 -->
+      <div class="table-operations">
+        <a-button type="primary" @click="$refs.createForm.handleAdd()" v-hasPerm="['system:channel:add']">
+          <a-icon type="plus" />新增
+        </a-button>
+        <a-button type="danger" :disabled="!isSelected" @click="handleDelete" v-hasPerm="['system:channel:delete']">
+          <a-icon type="delete" />删除
+        </a-button>
+        <a-dropdown v-hasPerm="['system:channel:add','system:channel:delete']">
+          <a-menu slot="overlay">
+            <a-menu-item v-hasPerm="['system:channel:add']" @click="$refs.createForm.handleAdd()">新增</a-menu-item>
+            <a-menu-item v-hasPerm="['system:channel:delete']" @click="handleDelete">删除</a-menu-item>
+          </a-menu>
+          <a-button>
+            更多操作 <a-icon type="down" />
           </a-button>
-          <a-dropdown>
-            <a-menu @click="handleMenuClick" slot="overlay">
-              <a-menu-item key="addRecord" @click="addRecord">新增</a-menu-item>
-              <a-menu-item @click="deleteRecord('batch')">删除</a-menu-item>
-            </a-menu>
-            <a-button>
-              更多操作 <a-icon type="down" />
-            </a-button>
-          </a-dropdown>
-        </a-space>
-<!--
-        <type-set :colSize="colSize" @changeSize="changeSize" :elId="id" @refresh="onRefresh"/>
--->
+        </a-dropdown>
+        <table-setting
+            :style="{float: 'right'}"
+            :table-size.sync="tableSize"
+            v-model="columns"
+            :refresh-loading="loading"
+            @refresh="getList" />
+      </div>
 
-        <standard-table
+      <standard-table
           :columns="columns"
-          :dataSource="dataSource"
-          :col-size="colSize"
+          :dataSource="list"
+          :size="tableSize"
           rowKey="channelId"
           :loading="loading"
-          :scroll="{ x: '100%'}"
-          :pagination="{
-            current: pageNum,
-            pageSize: pageSize,
-            total: total,
-            showSizeChanger: true,
-            showLessItems: true,
-            showQuickJumper: true,
-            showTotal: (total, range) => `总计 ${total} 条`
-          }"
-          :selectedRows.sync="selectedRows"
-          :getCheckboxProps="record => ({
-            props: {
-              disabled: record.status === '0'
-            }
-          })"
-          @change="onChange"
-          @selectedRowChange="onSelectChange"
+          :total="total"
+          :showSelectInfo='false'
+          :showRowSelection='true'
+          :selectedRowKeys='selectedRowKeys'
+          :selectedRows='selectedRows'
+          :pageNum="pageNum"
+          :pageSize="pageSize"
+          :pageSizeOptions="pageSizeOptions"
+          :sortChange="onSortChange"
+          :selectedRowChange="onSelectChange"
+          :pageSizeChange="onPageSizeChange"
+          :pageNumChange="onPageNumChange"
       >
-        <template slot="status" slot-scope="{text}">
-          <a-tag :color="text == '1' ? 'red' : 'green'">{{ text | statusStr }}</a-tag>
-        </template>
-        <template slot="time" slot-scope="{text, record}">
-          {{ record | timeStr }}
+        <template slot="status" slot-scope="{text,record}">
+          <span v-html="statusStr(text,record)"></span>
         </template>
         <template slot="action" slot-scope="{text, record}">
-          <a class="action-editor" :class="{'disabled': record.admin}" style="margin-right: 8px"
-             @click="editRecord(record)">
+          <a class="action-editor" v-hasPerm="['system:channel:edit']" style="margin-right: 8px"
+             @click="$refs.createForm.handleUpdate(record)">
             <a-icon type="edit"/>
             编辑
           </a>
-          <a-popconfirm
-              v-if="dataSource.length && !record.admin"
-              title="确认删除?"
-              @confirm="() => deleteRecord(record.channelId)"
-          >
-            <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
-              <a-icon type="delete"/>
-              删除
-            </a>
-          </a-popconfirm>
-          <a-dropdown>
+          <a class="action-delete" style="margin-right: 8px;" v-hasPerm="`system:channel:delete`" @click="handleDelete(record)">
+            <a-icon type="delete"/>
+            删除
+          </a>
+          <a-dropdown v-hasPerm="['system:channel:edit','system:channel:delete']">
             <a-menu slot="overlay">
-              <a-menu-item key="">
-                <a class="action-editor" :class="{'disabled': record.admin}"
-                   @click="editRecord(record)">
-                  <a-icon type="edit"/>
-                  编辑
+              <a-menu-item v-hasPerm="['system:channel:edit']">
+                <a class="action-editor"
+                   @click="$refs.createForm.handleUpdate(record)">
+                  <a-icon type="edit"/>编辑
                 </a>
               </a-menu-item>
-              <a-menu-item>
-                <a-popconfirm
-                    v-if="dataSource.length && !record.admin"
-                    title="确认删除?"
-                    @confirm="() => deleteRecord(record.channelId)"
-                >
-                  <a class="action-delete" style="margin-right: 8px;" v-auth="`delete`">
-                    <a-icon type="delete"/>
-                    删除
-                  </a>
-                </a-popconfirm>
+              <a-menu-item v-hasPerm="`system:channel:delete`">
+                <a class="action-delete" style="margin-right: 8px;" @click="handleDelete(record)">
+                  <a-icon type="delete"/>删除
+                </a>
               </a-menu-item>
             </a-menu>
-            <a class="">
+            <a class="" style="white-space: nowrap">
               更多操作 <a-icon type="down" />
             </a>
           </a-dropdown>
         </template>
       </standard-table>
-      </div>
-      <ChannelEdit @success="mFormSuccess"/>
+      <ChannelEdit ref="createForm" @ok="getList"/>
     </a-card>
   </page-layout>
 </template>
 
 <script>
 import PageLayout from '@/layouts/PageLayout'
-import StandardTable from '../../../components/table/StandardTable'
-import TypeSet from '../../common/type-set'
-import ChannelEdit from './m-form'
-import {dataSource as ds} from '../../../services/index'
-import moment from "moment";
+import StandardTable from '@/components/table/StandardTable'
+import { tableMixin } from '@/store/table-mixin'
+
+import ChannelEdit from './channel-form'
+import {dataSource} from '@/services/index'
 
 const columns = [
   {
@@ -194,6 +147,7 @@ const columns = [
   }, {
     title: '渠道名称',
     dataIndex: 'channelName',
+    sorter: true,
     width: 100
   }, {
     title: '渠道编码',
@@ -205,6 +159,12 @@ const columns = [
     align: 'left',
     sorter: true,
     width: 100,
+  },{
+    title: '排序',
+    dataIndex: 'channelSort',
+    align: 'center',
+    sorter: true,
+    width: 65
   }, {
     title: '状态',
     dataIndex: 'status',
@@ -236,33 +196,23 @@ const columns = [
     width: 80
   }, {
     title: '操作',
+    dataIndex: 'operater',
     scopedSlots: {customRender: 'action'},
-    align: 'center'
+    align: 'center',
+    width: 200
   }
 ]
 
 export default {
   components: {PageLayout, StandardTable, ChannelEdit},
+  mixins: [tableMixin],
   data() {
     return {
-      id: `${new Date().getTime()}-${Math.floor(Math.random() * 10)}`,
-      loading: false,
-      colSize: 'middle',
-      columns: columns, //列表定义
-      dataSource: [], //列表数据
-      conditions: {}, //查询条件
-      expand: false,
-      form: this.$form.createForm(this),
+      list: [],
       total: 0,
-      pageSize: 10,
-      pageNum: 1,
-      formVisible: false,
-      formType: '新增',
-      initialValue: {},
-      selectedRows: [],
-      roleList: [],
-      delets: [],
-      batchDeleteLoading: false,
+      loading: false,
+      statusOptions: [],
+      columns: columns,
     }
   },
 
@@ -272,36 +222,24 @@ export default {
     }
   },
 
-  filters: {
-    statusStr(val) {
-      switch (val) {
-        case '1':
-          return '停用'
-        case '0':
-          return '正常'
-        default:
-          return '-'
-      }
-    }
-  },
-
   created() {
+    this.statusOptions=this.$store.getters.system_normal_disable
     this.getList()
   },
 
-  beforeRouteLeave(to, from, next) {
-    this.formVisible = false
-    next()
-  },
-
   methods: {
+    statusStr(val) {
+      return this.selectDictLabel(this.statusOptions, val)
+    },
     /*获取数据列表*/
     getList() {
       this.loading = true
-      const {pageNum, pageSize, conditions} = this
-      ds.channelList({pageNum, pageSize, ...conditions}).then(res => {
+      const s = {}
+      s["searchExpireDate1"] = this.queryParam["searchExpireDate1"] != null ? this.$moment(this.queryParam["searchExpireDate1"]).format("YYYY-MM-DD") : '',
+      s["searchExpireDate2"] = this.queryParam["searchExpireDate2"] != null ?  this.$moment(this.queryParam["searchExpireDate2"]).format("YYYY-MM-DD"): '',
+      dataSource.channelList({...this.queryParam,...s}).then(res => {
         const {rows, count} = res
-        this.dataSource = rows
+        this.list = rows
         this.total = count
         this.loading = false
       }).catch(res => {
@@ -309,138 +247,26 @@ export default {
       })
     },
 
-    onSubmit(e) {
-      e.preventDefault()
-      this.form.validateFields((err) => {
-        if (!err) {
-          this.conditions = this.form.getFieldsValue()
-          this.conditions.searchExpireDate1 = this.conditions["searchExpireDate1"] != null ? moment(this.conditions["searchExpireDate1"]).format("YYYY-MM-DD") : null;
-          this.conditions.searchExpireDate2 = this.conditions["searchExpireDate2"] != null ? moment(this.conditions["searchExpireDate2"]).format("YYYY-MM-DD") : null;
-          this.onQuery()
-        }
+    /** 删除按钮操作 */
+    handleDelete (row) {
+      var that = this
+      const selectedIds = row.channelId ?  [row.channelId] : this.selectedRowKeys
+      this.$confirm({
+        title: '确认删除所选中数据?',
+        content: '当前选中编号为' + selectedIds + '的数据',
+        onOk () {
+          return dataSource.channelRemove({channelIds:selectedIds})
+              .then(() => {
+                that.onSelectChange([], [])
+                that.getList()
+                that.$message.success('删除成功')
+              })
+        },
+        onCancel () {}
       })
     },
-    onReset() {
-      this.form.resetFields();
-      this.conditions = {};
-      this.onQuery();
-    },
 
-    /*获取角色列表*/
-    getRoleList() {
-      ds.roleList({pageNum: 1, pageSize: 100}).then(res => {
-        const {rows, count} = res
-        this.roleList = rows
-      })
-    },
-    /*查询*/
-    onQuery() {
-      this.pageNum = 1
-      this.pageSize = 10
-      this.getList()
-    },
-
-    /*表格搜索条件改变查询*/
-    onChange(pagination, filters, sorter, {currentDataSource}) {
-      this.pageNum = pagination.current
-      this.pageSize = pagination.pageSize
-      this.conditions = {
-        ...this.conditions,
-        orderByColumn: sorter.columnKey,
-        orderDirection: sorter.order ? sorter.order == 'ascend' ? 'ASC' : 'DESC' : undefined
-      }
-      this.getList()
-    },
-
-    /*type刷新*/
-    onRefresh() {
-      this.getList()
-    },
-
-    /*选中行改变触发*/
-    onSelectChange(selectedRowKeys, selectedRows) {
-      this.delets = [...selectedRowKeys]
-    },
-
-    /*列表行高改变*/
-    changeSize(key) {
-      this.colSize = key
-    },
-
-    handleMenuClick (e) {
-      if (e.key === 'delete') {
-
-      }
-    },
-
-    /*新增*/
-    addRecord() {
-      this.formType = '新增'
-      this.initialValue = {}
-      this.formVisible = true
-    },
-
-    /*编辑*/
-    editRecord(record) {
-      this.formType = '编辑'
-      this.initialValue = {...record}
-      this.formVisible = true
-    },
-
-    /*删除*/
-    async deleteRecord(id) {
-      console.info("deleteRecord id:" + id)
-      if (id === 'batch')  {
-        if(this.delets.length == 0) {
-          this.$message.warn('至少选择一条记录')
-          return
-        }
-        this.batchDeleteLoading = true;
-      }
-      this.loading = true
-      console.info("deletes:" + this.delets)
-      let delets = id === 'batch' ? this.delets : [id]
-      await ds.channelRemove({ids: delets}).then(res => {
-        this.$message.success('删除成功')
-        this.getList()
-      }).catch(res => {
-      })
-      this.loading = false
-      this.batchDeleteLoading = false
-    },
-
-    mFormSuccess(res) {
-      this.formVisible = false
-      if (this.formType == '新增') {
-        this.dataSource = [res, ...this.dataSource]
-        this.total++
-      } else {
-        this.dataSource = this.dataSource.map(item => {
-          if (item.channelId == res.channelId) {
-            item = {...res}
-          }
-          return item
-        })
-      }
-    }
   }
 }
 </script>
 
-<style lang="less" scoped>
-.search{
-  margin-bottom: 44px;
-}
-.fold{
-  width: calc(100% - 216px);
-  display: inline-block
-}
-.operator{
-  margin-bottom: 3px;
-}
-@media screen and (max-width: 900px) {
-  .fold {
-    width: 100%;
-  }
-}
-</style>

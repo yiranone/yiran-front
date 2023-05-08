@@ -4,8 +4,11 @@ module.exports = {
     color: '#13c2c2',
     mode: 'dark',
   },
+  cachePage: true,
   multiPage: true,
+  hideFooter: true,
   animate: {
+    disabled: true,
     name: 'lightSpeed',
     direction: 'left'
   }

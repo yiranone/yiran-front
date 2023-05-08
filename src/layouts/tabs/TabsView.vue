@@ -273,7 +273,7 @@ export default {
     setCachedKey(route) {
       const page = this.pageList.find(item => item.path === route.path)
       page.unclose = route.meta && route.meta.page && (route.meta.page.closable === false)
-      if (!page._init_) {
+      if (!page._init_ && this.$refs.tabContent) {
         const vnode = this.$refs.tabContent.$vnode
         page.cachedKey = vnode.key + vnode.componentOptions.Ctor.cid
         page._init_ = true

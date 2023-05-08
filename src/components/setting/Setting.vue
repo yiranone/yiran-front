@@ -143,7 +143,7 @@ export default {
     directions() {
       return this.animates.find(item => item.name == this.animate.name).directions
     },
-    ...mapState('setting', ['theme', 'layout', 'animate', 'animates', 'palettes', 'multiPage', 'weekMode', 'fixedHeader', 'fixedSideBar', 'hideSetting', 'pageWidth'])
+    ...mapState('setting', ['theme', 'layout', 'animate', 'animates', 'palettes', 'multiPage', 'weekMode', 'fixedHeader', 'fixedSideBar', 'hideSetting', 'hideFooter', 'pageWidth'])
   },
   watch: {
     'animate.name': function(val) {
@@ -200,7 +200,7 @@ export default {
       return config
     },
     ...mapMutations('setting', ['setTheme', 'setLayout', 'setMultiPage', 'setWeekMode',
-      'setFixedSideBar', 'setFixedHeader', 'setAnimate', 'setHideSetting', 'setPageWidth'])
+      'setFixedSideBar', 'setFixedHeader', 'setAnimate', 'setHideSetting','setHideFooter', 'setPageWidth'])
   }
 }
 </script>

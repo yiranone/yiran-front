@@ -32,7 +32,7 @@
 </template>
 
 <script>
-  import {userService as us} from '../../../services/index'
+  import {userSource as us} from '../../../services/index'
 
   export default {
     name: "m-form",

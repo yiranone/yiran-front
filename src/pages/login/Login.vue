@@ -8,29 +8,25 @@
       <div class="desc"></div>
     </div>
     <div class="login">
-      <a-form @submit="onSubmit" :form="form">
+      <a-form-model ref="form" :model="form" :rules="rules">
         <a-alert type="error" :closable="true" v-show="error" :message="error" showIcon style="margin-bottom: 24px;"/>
-        <a-form-item>
-          <a-input
+        <a-form-model-item prop="name">
+          <a-input v-model="form.name"
               autocomplete="autocomplete"
               size="large"
-              placeholder="请输入账户名"
-              v-decorator="['name', {rules: [{ required: true, message: '请输入账户名', whitespace: true}]}]"
-          >
+              placeholder="请输入账户名">
             <a-icon slot="prefix" type="user"/>
           </a-input>
-        </a-form-item>
-        <a-form-item>
-          <a-input
+        </a-form-model-item>
+        <a-form-model-item prop="password">
+          <a-input v-model="form.password"
               size="large"
               placeholder="请输入密码"
               autocomplete="autocomplete"
-              type="password"
-              v-decorator="['password', {rules: [{ required: true, message: '请输入密码', whitespace: true}]}]"
-          >
+              type="password">
             <a-icon slot="prefix" type="lock"/>
           </a-input>
-        </a-form-item>
+        </a-form-model-item>
         <!--<a-tabs size="large" :tabBarStyle="{textAlign: 'center'}" style="padding: 0 2px;">
           <a-tab-pane tab="账户密码登录" key="1">
 
@@ -60,40 +56,64 @@
           <a style="float: right">忘记密码</a>
         </div>-->
         <a-form-item>
-          <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large" htmlType="submit"
+          <a-button :loading="logging" style="width: 100%;margin-top: 24px" size="large"
+                    htmlType="submit" @click="loginButton"
                     type="primary">登录
           </a-button>
         </a-form-item>
-        <!--<div>
+<!--        <div>
           其他登录方式
           <a-icon class="icon" type="alipay-circle" />
           <a-icon class="icon" type="taobao-circle" />
           <a-icon class="icon" type="weibo-circle" />
           <router-link style="float: right" to="/dashboard/workplace" >注册账户</router-link>
         </div>-->
-      </a-form>
+<!--
+        <button class="result_btn" @click.prevent="showBox">验证码</button>
+-->
+      </a-form-model>
     </div>
+    <!-- blockPuzzle  clickWord -->
+    <Verify
+        ref="verify"
+        :captcha-type="captcha"
+        :mode="'pop'"
+        :img-size="{width:'400px',height:'200px'}"
+        @success="verifySuccess"
+    />
   </common-layout>
 </template>
 
 <script>
-  import Mock from 'mockjs'
-  import '@/mock/extend'
-  import CommonLayout from '../../layouts/CommonLayout'
-  import {userService as us} from '../../services'
-  import {setAuthorization} from '../../utils/request'
-  import {loadRoutes} from '../../utils/routerUtil'
+  import CommonLayout from '@/layouts/CommonLayout'
+  import Verify from '@/components/verifition/Verify'
+  import {userSource as us} from '@/services'
+  import {setAuthorization} from '@/utils/request'
   import {mapMutations, mapActions} from 'vuex'
+  import {loadRoutes, loadGuards, loadPermissions, loadAllDictTypes} from '@/utils/routerUtil'
 
   export default {
     name: 'Login',
-    components: {CommonLayout},
+    components: {CommonLayout,Verify},
     data() {
       return {
         logging: false,
         error: '',
-        form: this.$form.createForm(this)
+        captchaVerification: '',
+        form:{},
+        captcha:'none',
+        rules: {
+          name: [{ required: true, message: '登录名称不能为空', trigger: 'blur' }],
+          password: [{ required: true, message: '请输入密码', whitespace: true, trigger: 'blur' }]
+        }
       }
+    },
+    created() {
+        //去服务器获取配置，当前是否配置了验证码登录校验
+      us.loginConfig().then(data => {
+        console.info("服务器配置" + JSON.stringify(data))
+        this.captcha = data.captcha
+      })
     },
     computed: {
       systemName() {
@@ -107,31 +127,62 @@
     methods: {
       ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
       // ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
-      onSubmit(e) {
-        e.preventDefault()
-        this.form.validateFields(async (err) => {
-          if (!err) {
+      verifySuccess(d){
+        console.info("验证码验证返回"+JSON.stringify(d))
+        this.captchaVerification = d.captchaVerification
+        this.login()
+      },
+      showBox(){
+        //当mode="pop"时,调用组件实例的show方法显示组件
+        this.$refs.verify.show();
+      },
+      loginButton() {
+        console.info("点击登录按钮"+this.captcha)
+        this.$refs.form.validate((valid) => {
+          if (valid) {
+            if (this.captcha != 'none') {
+              this.showBox()
+            } else {
+              this.login()
+            }
+          }
+        })
+      },
+      login() {
+        console.info("用户登录",this.form.name)
+        this.$refs.form.validate((valid) => {
+          if (valid) {
             this.logging = true
-            const name = this.form.getFieldValue('name')
-            const password = this.form.getFieldValue('password')
-            await us.login(name, password)
+            const name = this.form.name
+            const password = this.form.password
+            const captchaVerification = this.captchaVerification
+            us.login(name, password,captchaVerification)
                 .then(this.afterLogin)
                 .catch(err => {
                   if (err.msg) this.error = err.msg
                 })
             this.logging = false
+          } else {
+            return false
           }
         })
       },
       afterLogin(res) {
         // const {user, permissions, roles} = res
+        console.info("设置登录用户" + JSON.stringify(res))
         this.setUser(res)
-        // this.setPermissions(permissions)
+        // debugger
+
+        //this.setPermissions(permissions)
         // this.setRoles(roles)
         setAuthorization({token: res.token})
         // 获取路由配置
-        this.$message.success(Mock.mock('@TIMEFIX').CN + '，欢迎回来', 3)
+        this.$message.success('登录成功，欢迎回来', 3)
+        console.info("加载路由配置")
         loadRoutes({router: this.$router, store: this.$store, i18n: this.$i18n})
+        console.info("设置登录用户的权限")
+        loadPermissions(this.$router,this.$store,this.$i18n)
+        loadAllDictTypes(this.$router,this.$store,this.$i18n)
         // this.getWebsocketInfo()
         this.$router.push('/home')
       }

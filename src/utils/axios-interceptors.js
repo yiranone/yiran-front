@@ -1,5 +1,6 @@
 import Cookie from 'js-cookie'
 import {removeAuthorization} from "@/utils/request";
+import {authUrl, loginIgnore, router} from '@/router'
 // 401拦截
 const resp401 = {
   /**
@@ -48,18 +49,30 @@ const respCommon = {
   onFulfilled(response, options) {
     const {message} = options
     let res = response.data
+    //下载文件的处理
+    const respHeader = response.headers['content-type'];
+    if(respHeader.indexOf("application/vnd.openxmlformats") == 0 || respHeader.indexOf("application/x-msdownload") == 0)
+      return response;
+    if(respHeader.indexOf("application/json") < 0)
+      return response;
     if (res.code === 200) {
       // message.error('无此接口权限')
+      // console.info(router)
+      // console.info(router.currentRoute.path)
       return res.data
     } else if (res.code === 401) {
-      // 用户没有登陆
-      // options.router.options.routes.push({path: '/login'})
-      //this.push({path: '/login'})
-      removeAuthorization() //用户没有登陆，删除token
-      message.warn(res.msg)
+      // 用户没有登录
+      console.info("用户没有登录:" + res.msg)
+      const currentPath = router.currentRoute.path;
+      if("/login" != currentPath) { //当前页面不是登录页面，跳转到登录页面
+        router.push({ path: '/login' })
+        message.warn(res.msg)
+      }
+      removeAuthorization() //用户没有登录，删除token
       return Promise.reject(res)
     } else {
-      message.warn(res.msg)
+      if(res.msg != null)
+        message.warn(res.msg)
       return Promise.reject(res)
     }
   },
@@ -86,7 +99,7 @@ const reqCommon = {
   onFulfilled(config, options) {
     const {message} = options
     const {url, xsrfCookieName} = config
-    if (url.indexOf('login') === -1 && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
+    if (authUrl.needLogin(url) && xsrfCookieName && !Cookie.get(xsrfCookieName)) {
       message.warning('认证 token 已过期，请重新登录')
     }
     return config

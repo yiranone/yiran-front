@@ -1,58 +1,41 @@
-import routerMap from '../router/async/router.map'
+import routerMap from '../router/router.map'
 import {mergeI18nFromRoutes} from '@/utils/i18n'
 import Router from 'vue-router'
 import deepMerge from 'deepmerge'
-import {userService as us} from "../services";
-import {checkAuthorization} from "./request";
+import {userSource as us, metadataSource} from "../services";
+import {checkAuthorization, randomTest} from "./request";
+import options from "@/router/config";
+import {initRouter, router} from "@/router";
+import {generateString} from "@/utils/stringUtil";
 
-/**
- * 根据 路由配置 和 路由组件注册 解析路由
- * @param routesConfig 路由配置
- * @param routerMap 本地路由组件注册配置
- */
-/*function parseRoutes(routesConfig, routerMap) {
-  let routes = []
-  routesConfig.forEach(item => {
-    // 获取注册在 routerMap 中的 router，初始化 routeCfg
-    let router = undefined, routeCfg = {}
-    if (typeof item === 'string' && routerMap[item]) {
-      router = routerMap[item]
-      routeCfg = {path: router.path || item, router: item}
-    } else if (typeof item === 'object') {
-      router = routerMap[item.router]
-      routeCfg = item
-    }
-    // 从 router 和 routeCfg 解析路由
-    if (!router) {
-      console.warn(`can't find register for router ${routeCfg.router}, please register it in advance.`)
-    } else {
-      const route = {
-        path: routeCfg.path || router.path || routeCfg.router,
-        name: routeCfg.name || router.name,
-        component: router.component,
-        redirect: routeCfg.redirect || router.redirect,
-        meta: {
-          authority: routeCfg.authority || router.authority || '*',
-          icon: routeCfg.icon || router.icon,
-          page: routeCfg.page || router.page
-        }
-      }
-      if (routeCfg.invisible || router.invisible) {
-        route.meta.invisible = true
-      }
-      if (routeCfg.children && routeCfg.children.length > 0) {
-        route.children = parseRoutes(routeCfg.children, routerMap)
-      }
-      routes.push(route)
-    }
-  })
-  return routes
-}*/
+// const loadView = (view) => {
+//   if(view.startsWith("/")) {
+//     view = view.toString().substring(1)
+//   }
+//   return (resolve) => require([`@/${view}`], resolve)
+// }
+
+// const loadView = (view) => {
+//   let str=view.toString().substring(1)
+//   console.info("str:"+str)
+//   return (resolve) => require([`../${str}`], resolve)
+// }
+
+function resetRouter (r) {
+  const newRouter = initRouter()
+  // console.info("用户重置=="+ JSON.stringify(newRouter.options))
+  // r = newRouter
+  r.options = newRouter.options
+  r.matcher = newRouter.matcher
+  // console.info("用户退出登录，重置路由为:" + JSON.stringify(newRouter.options))
+}
 
 function parseRoutes(routesConfig, routerMap) {
   let routes = []
-  routesConfig.forEach(item => {
+  for (let i = 0; i < routesConfig.length; i++) {
+    const item = routesConfig[i]
     // 获取注册在 routerMap 中的 router，初始化 routeCfg
+    //console.info("菜单处理:"+JSON.stringify(item))
     let router = undefined, routeCfg = {}
     if (typeof item === 'string' && routerMap[item]) {
       router = routerMap[item]
@@ -62,20 +45,58 @@ function parseRoutes(routesConfig, routerMap) {
       routeCfg = item
     }
 
-    if (router == undefined)
-      router = {}
+    if (!router) {
+      //console.warn(`can't find register for router ${routeCfg.router}, please register it in advance.`)
+      router = typeof item === 'string' ? {path: item, name: item} : item
+    }
 
+    // 从 router 和 routeCfg 解析路由
+    const meta = {
+      authority: router.authority,
+      icon: router.icon,
+      page: router.page,
+      link: router.link,
+      params: router.params,
+      query: router.query,
+      ...router.meta
+    }
+    const cfgMeta = {
+      authority: routeCfg.authority,
+      icon: routeCfg.icon,
+      page: routeCfg.page,
+      link: routeCfg.link,
+      params: routeCfg.params,
+      query: routeCfg.query,
+      ...routeCfg.meta
+    }
+    Object.keys(cfgMeta).forEach(key => {
+      if (cfgMeta[key] === undefined || cfgMeta[key] === null || cfgMeta[key] === '') {
+        delete cfgMeta[key]
+      }
+    })
+    Object.assign(meta, cfgMeta)
     const route = {
       path: routeCfg.path || router.path || routeCfg.router,
       name: routeCfg.name || router.name,
-      menuType: routeCfg.menuType,
-      component: routeCfg.component || router.component,
+      component: router.component,
       redirect: routeCfg.redirect || router.redirect,
-      meta: {
-        authority: routeCfg.authority || router.authority || '*',
-        icon: routeCfg.icon || router.icon,
-        page: routeCfg.page || router.page,
+      meta: {...meta, authority: meta.authority || '*'}
+    }
+    if (routeCfg.invisible || router.invisible) {
+      route.meta.invisible = true
+    }
+    if(routeCfg.component && routeCfg.component.length > 0) {
+      //console.info("注册组件"+ routeCfg.component)
+      let view = routeCfg.component.toString();
+      if(view.startsWith("/")) {
+        view = view.substring(1)
       }
+      route.component = () => import(`@/${view}`)
+      // route.component = loadView(`${routeCfg.component}`)
+    }
+
+    if (item.menuType == 'M') { //如果是目录，给空的视图
+      route.component = () => import('@/layouts/BlankView')
     }
     if (routeCfg.invisible || router.invisible || (routeCfg.meta && routeCfg.meta.invisible)) {
       route.meta.invisible = true
@@ -83,52 +104,36 @@ function parseRoutes(routesConfig, routerMap) {
     if (routeCfg.children && routeCfg.children.length > 0) {
       route.children = parseRoutes(routeCfg.children, routerMap)
     }
-    if (item.menuType == 'M') { //如果是目录，给空的视图
-      route.component = () => import('@/layouts/BlankView')
+    if(route.path == null && route.meta && route.meta.link) {
+      // const randomString = generateString (11)
+      // console.info("链接route，自动给一个path=",randomString)
+      // route.path = randomString;
     }
     if(route.path == null) {
       console.info("菜单name=[" + route.name + "]的path没有设置，不显示")
     } else {
-      //console.info("菜单>>" + JSON.stringify(route))
+      console.info("菜单增加路由:" + JSON.stringify(route))
       routes.push(route)
     }
-  })
+  }
   return routes
 }
 
-function filterNoChildFolder(routes) {
-  //如果是目录，子节点为空，不展示
-  for (let index = 0; index < routes.length; index++) {
-    let item = routes[index];
-    if (item.children && item.children.length > 0) {
-      filterNoChildFolder(item.children)
-    }
-    if((item.children == null || item.children.length == 0) &&
-        (item.menuType == 'M')) {
-      console.info("过滤空菜单:" + item.name)
-      routes.splice(index, 1);
-      index--
-    } else {
-    }
-  }
-}
-
 /**
- * 加载路由
+ * 加载服务器路由
  * @param router 应用路由实例
  * @param store 应用的 vuex.store 实例
  * @param i18n 应用的 vue-i18n 实例
  * @param routesConfig 路由配置
  */
-async function loadRoutes({router, store, i18n}, routesConfig) {
-  // 如果 routesConfig 有值，则更新到本地，否则从本地获取
-  if (!routesConfig && checkAuthorization()) {
+async function loadRoutes({router, store, i18n}) {
+  // 如果 serverRoutesConfig 有值，则更新到本地，否则从本地获取
+  let serverRoutesConfig = null
+  if (checkAuthorization()) {
     await us.getRoutesConfig().then(res => {
-      routesConfig =[{
+      serverRoutesConfig =[{
         router: 'root',
-        children: [{
-          router: 'percenter'
-        }, ...res]
+        children: [...res]
       }]
     })
 
@@ -138,30 +143,81 @@ async function loadRoutes({router, store, i18n}, routesConfig) {
     //         router: 'percenter'
     //       }, ...router.options.routes]
     //     }]
-    console.info("后台应答目录:" + JSON.stringify(routesConfig))
+    console.info("后台应答目录:" + JSON.stringify(serverRoutesConfig))
   }
   // 如果开启了异步路由，则加载异步路由配置
+  let finalRoutes = router.options.routes
   const asyncRoutes = store.state.setting.asyncRoutes
   if (asyncRoutes) {
-    if (routesConfig && routesConfig.length > 0) {
-      let routes = parseRoutes(routesConfig, routerMap)
-      filterNoChildFolder(routes)
-      formatRoutes(routes)
-      const finalRoutes = mergeRoutes(router.options.routes, routes)
+    if (serverRoutesConfig && serverRoutesConfig.length > 0) {
+      let serverRoutes = parseRoutes(serverRoutesConfig, routerMap)
+      //filterNoChildFolder(serverRoutes)
+      formatRoutes(serverRoutes)
+      finalRoutes = deepMergeRoutes(router.options.routes, serverRoutes)
       router.options = {...router.options, routes: finalRoutes}
       router.matcher = new Router({...router.options, routes:[]}).matcher
-      router.addRoutes(finalRoutes)
+      router.addRoutes(finalRoutes.filter(e => !!e.path))
     }
   }
   // 提取路由国际化数据
   mergeI18nFromRoutes(i18n, router.options.routes)
   // 初始化Admin后台菜单数据
-  const rootRoute = router.options.routes.find(item => item.path === '/')
+  const rootRoute = finalRoutes.find(item => item.path === '/')
   const menuRoutes = rootRoute && rootRoute.children
   if (menuRoutes) {
-    store.commit('setting/setMenuData', menuRoutes)
+    const formatMenu = routesList => {
+      return Object.values(routesList).map(item => {
+        let menu = {}
+        //菜单有这几个属性就可以了
+        menu.name = item.name
+        if(item.path)
+          menu.path = item.path
+        if (item.meta) {
+          menu.meta={}
+          menu.meta.invisible = item.meta.invisible
+          menu.meta.icon = item.meta.icon
+          menu.meta.link = item.meta.link
+          menu.meta.params = item.meta.params
+          menu.meta.query = item.meta.query
+        }
+        if (item.children) {
+          menu.children = formatMenu(item.children)
+        }
+        return menu
+      })
+    }
+    let menus = formatMenu(menuRoutes)
+    store.commit('setting/setMenuData', menus)
   }
 }
+
+function loadUser(router, store, i18n) {
+  if (checkAuthorization()) {
+    us.getProfile().then(data => {
+      console.info("当前登录用户，后台应答profile:" + JSON.stringify(data))
+      store.commit('account/setUser', data)
+    })
+  }
+}
+
+function loadPermissions(router, store, i18n) {
+  if (checkAuthorization()) {
+     us.getCurrentPerms().then(data => {
+       console.info("当前登录用户，后台应答权限:" + JSON.stringify(data))
+       store.commit('account/setPermissions', data)
+    })
+  }
+}
+
+function loadAllDictTypes(router, store, i18n) {
+  if (checkAuthorization()) {
+    metadataSource.dictAll().then(data => {
+      console.info("后台返回数据字典:" + JSON.stringify(data))
+      store.commit('account/setDictTypes', data)
+    })
+  }
+}
+
 
 /**
  * 合并路由
@@ -225,7 +281,7 @@ function formatRoutes(routes) {
       route.path = '/' + path
     }
   })
-  formatAuthority(routes)
+  //formatAuthority(routes)
 }
 
 /**
@@ -296,4 +352,4 @@ function loadGuards(guards, options) {
   })
 }
 
-export {parseRoutes, loadRoutes, formatAuthority, getI18nKey, loadGuards, deepMergeRoutes, formatRoutes}
+export {parseRoutes, resetRouter, loadRoutes, getI18nKey, loadGuards,loadUser,loadPermissions, loadAllDictTypes,deepMergeRoutes, formatRoutes}

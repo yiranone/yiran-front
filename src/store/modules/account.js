@@ -1,5 +1,4 @@
 import Websocket from '../../utils/websocket'
-import {WITHDRAW_NOTICE_URI} from '../../services/api'
 
 export default {
   namespaced: true,
@@ -7,6 +6,7 @@ export default {
     user: undefined,
     permissions: null,
     roles: null,
+    dictTypes: [],
     routesConfig: null,
     innerAccountList: [],
     // websocket: new Websocket()
@@ -24,16 +24,28 @@ export default {
       return state.user
     },
     permissions: state => {
-      if (!state.permissions) {
+      // if (!state.permissions) {
+      //   try {
+      //     const permissions = localStorage.getItem(process.env.VUE_APP_PERMISSIONS_KEY)
+      //     state.permissions = JSON.parse(permissions)
+      //     state.permissions = state.permissions ? state.permissions : []
+      //   } catch (e) {
+      //     console.error(e)
+      //   }
+      // }
+      return state.permissions
+    },
+    dictTypes: state => {
+      if (!state.dictTypes) {
         try {
-          const permissions = localStorage.getItem(process.env.VUE_APP_PERMISSIONS_KEY)
-          state.permissions = JSON.parse(permissions)
-          state.permissions = state.permissions ? state.permissions : []
+          const dictTypes = localStorage.getItem(process.env.VUE_APP_DICT_TYPE_KEY)
+          state.dictTypes = JSON.parse(dictTypes)
+          state.dictTypes = state.dictTypes ? state.dictTypes : []
         } catch (e) {
           console.error(e)
         }
       }
-      return state.permissions
+      return state.dictTypes
     },
     roles: state => {
       if (!state.roles) {
@@ -65,9 +77,13 @@ export default {
       state.user = user
       localStorage.setItem(process.env.VUE_APP_USER_KEY, JSON.stringify(user || {}))
     },
+    setAvatar (state, avatar) {
+      state.user.avatar = avatar
+      localStorage.setItem(process.env.VUE_APP_USER_KEY, JSON.stringify(state.user || {}))
+    },
     setPermissions(state, permissions) {
       state.permissions = permissions
-      localStorage.setItem(process.env.VUE_APP_PERMISSIONS_KEY, JSON.stringify(permissions || []))
+      // localStorage.setItem(process.env.VUE_APP_PERMISSIONS_KEY, JSON.stringify(permissions || []))
     },
     setRoles(state, roles) {
       state.roles = roles
@@ -77,9 +93,10 @@ export default {
       state.routesConfig = routesConfig
       localStorage.setItem(process.env.VUE_APP_ROUTES_KEY, JSON.stringify(routesConfig || {}))
     },
-    setInnerAccountList(state, innerAccountList) {
-      state.innerAccountList = innerAccountList
-    }
+    setDictTypes (state, dictTypes) {
+      state.dictTypes = dictTypes
+      localStorage.setItem(process.env.VUE_APP_DICT_TYPE_KEY, JSON.stringify(dictTypes || []))
+    },
   },
   actions: {
     // getWebsocketInfo({state}) {

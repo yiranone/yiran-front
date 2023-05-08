@@ -92,7 +92,7 @@ case 1:
                      .replace(/\\v/g,'\v')
                      .replace(/\\f/g,'\f')
                      .replace(/\\b/g,'\b');
-        
+
 break;
 case 2:
 this.$ = yytext == String(Number(yytext))? Number(yytext): yytext;

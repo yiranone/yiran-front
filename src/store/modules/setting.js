@@ -13,6 +13,7 @@ export default {
   namespaced: true,
   state: {
     isMobile: false,
+    isMenuLoad: false,
     animates: ADMIN.animates,
     palettes: ADMIN.palettes,
     pageMinHeight: 0,
@@ -23,6 +24,13 @@ export default {
     ...localSetting
   },
   getters: {
+    lang: state => {
+      const lang = localStorage.getItem(process.env.VUE_APP_LANG_KEY)
+      console.info("storage lang:"+ lang + ",setting lang:" + state.lang)
+      if(lang != null)
+        state.lang = lang
+      return state.lang
+    },
     menuData(state, getters, rootState) {
       /*if (state.filterMenu) {
         const {permissions, roles} = rootState.account
@@ -43,6 +51,10 @@ export default {
     },
     subMenu(state) {
       const {menuData, activatedFirst} = state
+      if (menuData == null || menuData.length == 0) {
+        console.info("menuData is null")
+        return []
+      }
       if (!menuData[0].fullPath) {
         formatFullPath(menuData)
       }
@@ -63,6 +75,12 @@ export default {
     setMultiPage (state, multiPage) {
       state.multiPage = multiPage
     },
+    setTableSize (state, tableSize) {
+      state.tableSize = tableSize
+    },
+    setTableBordered (state, tableBordered) {
+      state.tableBordered = tableBordered
+    },
     setAnimate (state, animate) {
       state.animate = animate
     },
@@ -77,9 +95,13 @@ export default {
     },
     setLang(state, lang) {
       state.lang = lang
+      localStorage.setItem(process.env.VUE_APP_LANG_KEY, lang)
     },
     setHideSetting(state, hideSetting) {
       state.hideSetting = hideSetting
+    },
+    setHideFooter(state, hideFooter) {
+      state.hideFooter = hideFooter
     },
     correctPageMinHeight(state, minHeight) {
       state.pageMinHeight += minHeight
@@ -87,6 +109,7 @@ export default {
     setMenuData(state, menuData) {
       console.info("设置目录:" + JSON.stringify(menuData))
       state.menuData = menuData
+      state.isMenuLoad = true
     },
     setAsyncRoutes(state, asyncRoutes) {
       state.asyncRoutes = asyncRoutes
@@ -110,6 +133,11 @@ export default {
         }
         sessionStorage.setItem(process.env.VUE_APP_TBAS_TITLES_KEY, JSON.stringify(state.customTitles))
       }
-    }
+    },
+    resetState(state) {
+      console.info("重置状态")
+      state.menuData = []
+      state.isMenuLoad = false
+    },
   }
 }
