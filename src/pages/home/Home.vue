@@ -21,9 +21,10 @@
                     </a-tooltip>
                     <div class="mini-chart">
                         <div class="chart-content" :style="{height: 46}">
-                            <v-chart :force-fit="true" :height="height" :data="loginCountDatas" :padding="[36, 5, 18, 5]">
+                            <v-chart :force-fit="true" :height="height" :data="loginCountDatas" :scale="scaleCount" :padding="[36, 5, 18, 5]">
                                 <v-tooltip />
-                                <v-smooth-area position="x*y"/>
+                                <v-smooth-area position="x*y" color="blue"/>
+                                <v-smooth-line position="x*y" color="blue"/>
                             </v-chart>
                         </div>
                     </div>
@@ -37,40 +38,16 @@
                     </a-tooltip>
                     <div class="mini-chart">
                         <div class="chart-content" :style="{height: 46}">
-                            <v-chart :force-fit="true" :height="height" :data="registerCountDatas" :padding="[36, 5, 18, 5]">
-                                <v-tooltip />
-                                <v-smooth-area position="x*y"/>
+                            <v-chart :force-fit="true" :height="height" :data="registerCountDatas"  :scale="scaleCount" :padding="[36, 5, 18, 5]">
+                                <v-tooltip crosshairs="y" title="x"/>
+                                <v-line position="x*y" color="green"/>
+                                <v-area position="x*y" color="green" :opacity="0.7"/>
                             </v-chart>
                         </div>
                     </div>
                     <div slot="footer">日均注册<span>{{averageRegisterCount}}</span></div>
                 </chart-card>
             </a-col>
-            <!--      <a-col :sm="24" :md="12" :xl="6">
-                    <chart-card :loading="loading" :title="$t('payments')" total="￥ 189,345">
-                      <a-tooltip :title="$t('introduce')" slot="action">
-                        <a-icon type="info-circle-o" />
-                      </a-tooltip>
-                      <div>
-                        <mini-bar />
-                      </div>
-                      <div slot="footer">{{$t('conversion')}} <span>60%</span></div>
-                    </chart-card>
-                  </a-col>
-                  <a-col :sm="24" :md="12" :xl="6">
-                    <chart-card :loading="loading" :title="$t('operating')" total="73%">
-                      <a-tooltip :title="$t('introduce')" slot="action">
-                        <a-icon type="info-circle-o" />
-                      </a-tooltip>
-                      <div>
-                        <mini-progress target="90" percent="78" color="#13C2C2" height="8px"/>
-                      </div>
-                      <div slot="footer" style="white-space: nowrap;overflow: hidden">
-                        <trend style="margin-right: 16px" :term="$t('wow')" :percent="12" :is-increase="true" :scale="0" />
-                        <trend :term="$t('dod')" :target="100" :value="89" :scale="0" />
-                      </div>
-                    </chart-card>
-                  </a-col>-->
         </a-row>
     </div>
 </template>
@@ -81,23 +58,12 @@ import ChartCard from '@/components/card/ChartCard'
 import {dataSource} from "@/services";
 
 
-const tooltip = [
-    'x*y',
-    (x, y) => ({
-        name: x,
-        value: y
-    })
-]
-
-const scale = [{
-    dataKey: 'x',
-    min: 2
-}, {
-    dataKey: 'y',
-    title: '时间',
-    min: 1,
-    max: 22
-}]
+const data = [
+    {country: 'Europe', year: '1750', value: 163},
+    {country: 'Europe', year: '1800', value: 203},
+    {country: 'Europe', year: '1950', value: 547},
+    {country: 'Europe', year: '1999', value: 129},
+];
 
 export default {
     name: 'Analysis',
@@ -112,9 +78,17 @@ export default {
             lastDayPercent : 0,
             lastWeekPercent : 0,
             loginCountDatas:[],
-            scale,
+            data2:[],
+            scaleCount:[{
+                dataKey: 'x',
+                alias: '日期',
+            }, {
+                dataKey: 'y',
+                alias: '次数',
+                title: '',
+                min: 0
+            }],
 
-            tooltip,
             height: 100,
             averageLoginCount:0,
             twoWeeksLoginCount:0,
@@ -143,21 +117,28 @@ export default {
                 for (let i = 0; i < rows.loginCountX.length; i += 1) {
                     this.loginCountDatas.push({
                         x: rows.loginCountX[i],
-                        y: rows.loginCountY[i]
+                        y: rows.loginCountY[i],
+                        // title: '登陆用户数量'
                     })
                 }
+                console.log(this.loginCountDatas)
                 this.averageLoginCount = rows.averageLoginCount
                 this.twoWeeksLoginCount = rows.twoWeeksLoginCount
-
+                //debugger
                 this.registerCountDatas = []
                 for (let i = 0; i < rows.registerCountX.length; i += 1) {
                     this.registerCountDatas.push({
                         x: rows.registerCountX[i],
-                        y: rows.registerCountY[i]
+                        y: rows.registerCountY[i],
+                        // title: '注册用户数量'
                     })
                 }
                 this.averageRegisterCount = rows.averageRegisterCount
                 this.twoWeeksRegisterCount = rows.twoWeeksRegisterCount
+
+                for (let i = 0; i < data.length; i += 1) {
+                    this.data2.push(data[i])
+                }
 
                 this.loading = false
             }).catch(res => {
