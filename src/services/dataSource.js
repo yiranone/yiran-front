@@ -2,6 +2,10 @@ import API from './api'
 import {METHOD, request} from '../utils/request'
 
 const dataSource = {
+
+  homeMemberCount: async (params) => {
+    return request(API.HOME_MEMBER_COUNT_URI, METHOD.POST, params)
+  },
   /*菜单列表*/
   menuList: async (params) => {
     return request(API.MENU_LIST_URI, METHOD.POST, params)

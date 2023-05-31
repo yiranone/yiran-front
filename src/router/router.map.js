@@ -1,8 +1,8 @@
 // 视图组件
 const view = {
   tabs: () => import('@/layouts/tabs'),
-  blank: () => import('@/layouts/BlankView.vue'),
-  page: () => import('@/layouts/PageView.vue')
+  blank: () => import('@/layouts/BlankView'),
+  page: () => import('@/layouts/PageView')
 }
 
 // 路由组件注册
@@ -18,14 +18,14 @@ const routerMap = {
     name: '个人中心',
     path: 'center',
     invisible: true,
-    component: () => import('@/pages/person/center/index.vue')
+    component: () => import('@/pages/person/center')
   },
   personSetting :{
     authority: '*',
     name: '个人设置',
     path: 'setting',
     invisible: true,
-    component: () => import('@/pages/person/setting/index.vue')
+    component: () => import('@/pages/person/setting')
   },
   home: {
     name: '首页',
@@ -44,19 +44,19 @@ const routerMap = {
     name: '没有权限访问',
     path: '403',
     invisible: true,
-    component: () => import('@/pages/exception/403.vue')
+    component: () => import('@/pages/exception/403')
   },
   exp404: {
     name: '页面没找到',
     path: '404',
     invisible: true,
-    component: () => import('@/pages/exception/404.vue')
+    component: () => import('@/pages/exception/404')
   },
   exp500: {
     name: '服务器异常',
     path: '500',
     invisible: true,
-    component: () => import('@/pages/exception/500.vue')
+    component: () => import('@/pages/exception/500')
   },
 // /*  person: {
 //     authority: '*',

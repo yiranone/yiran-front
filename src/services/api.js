@@ -11,6 +11,8 @@ module.exports = {
   PROFILE_UPDATE: 'system/user/profile/update',
   PROFILE_UPDATE_AVATAR: 'system/user/profile/updateAvatar',
 
+  HOME_MEMBER_COUNT_URI: 'biz/home/member/count', // 首页用户数量
+
   METADATA_CHANNEL_ALL: 'metadata/channel/all',
   METADATA_DEPT_ALL: 'metadata/dept/all',
   METADATA_DEPT_TREE: 'metadata/dept/tree',
