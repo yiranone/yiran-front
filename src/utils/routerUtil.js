@@ -2,11 +2,12 @@ import routerMap from '../router/router.map'
 import {mergeI18nFromRoutes} from '@/utils/i18n'
 import Router from 'vue-router'
 import deepMerge from 'deepmerge'
-import {userSource as us, metadataSource} from "../services";
+import {userSource as us, metadataSource, metadataSource as ms} from "../services";
 import {checkAuthorization, randomTest} from "./request";
 import options from "@/router/config";
 import {initRouter, router} from "@/router";
 import {generateString} from "@/utils/stringUtil";
+
 
 // const loadView = (view) => {
 //   if(view.startsWith("/")) {
@@ -16,7 +17,7 @@ import {generateString} from "@/utils/stringUtil";
 // }
 
 // const loadView = (view) => {
-//   let str=view.toString().substring(1)
+//   let str=view.toString().substring(1Ï)
 //   console.info("str:"+str)
 //   return (resolve) => require([`../${str}`], resolve)
 // }
@@ -130,7 +131,9 @@ async function loadRoutes({router, store, i18n}) {
   // 如果 serverRoutesConfig 有值，则更新到本地，否则从本地获取
   let serverRoutesConfig = null
   if (checkAuthorization()) {
+    console.info("loadRoutes")
     await us.getRoutesConfig().then(res => {
+      console.info("loadRoutes success")
       serverRoutesConfig =[{
         router: 'root',
         children: [...res]
@@ -143,7 +146,7 @@ async function loadRoutes({router, store, i18n}) {
     //         router: 'percenter'
     //       }, ...router.options.routes]
     //     }]
-    console.info("后台应答目录:" + JSON.stringify(serverRoutesConfig))
+    // console.info("后台应答目录:" + JSON.stringify(serverRoutesConfig))
   }
   // 如果开启了异步路由，则加载异步路由配置
   let finalRoutes = router.options.routes
@@ -153,9 +156,9 @@ async function loadRoutes({router, store, i18n}) {
       let serverRoutes = parseRoutes(serverRoutesConfig, routerMap)
       //filterNoChildFolder(serverRoutes)
       formatRoutes(serverRoutes)
-      finalRoutes = deepMergeRoutes(router.options.routes, serverRoutes)
-      router.options = {...router.options, routes: finalRoutes}
-      router.matcher = new Router({...router.options, routes:[]}).matcher
+      finalRoutes = deepMergeRoutes([], serverRoutes)
+      router.options.routes = [...router.options.routes, ...finalRoutes]
+      // router.matcher = new Router({...router.options, routes:[]}).matcher
       router.addRoutes(finalRoutes.filter(e => !!e.path))
     }
   }
@@ -188,6 +191,16 @@ async function loadRoutes({router, store, i18n}) {
     }
     let menus = formatMenu(menuRoutes)
     store.commit('setting/setMenuData', menus)
+    return menus
+  }
+}
+
+function loadLoginConfig(router, store, i18n) {
+  if (checkAuthorization()) {
+    us.loginConfig().then(data => {
+      console.info("加载登录配置，后台应答:" + JSON.stringify(data))
+      store.commit('account/setLoginConfig', data)
+    })
   }
 }
 
@@ -200,24 +213,27 @@ function loadUser(router, store, i18n) {
   }
 }
 
-function loadPermissions(router, store, i18n) {
+async function loadPermissions(router, store, i18n) {
   if (checkAuthorization()) {
-     us.getCurrentPerms().then(data => {
+     await us.getCurrentPerms().then(data => {
        console.info("当前登录用户，后台应答权限:" + JSON.stringify(data))
        store.commit('account/setPermissions', data)
     })
   }
 }
 
-function loadAllDictTypes(router, store, i18n) {
+async function loadAllDictTypes(router, store, i18n) {
   if (checkAuthorization()) {
-    metadataSource.dictAll().then(data => {
+    await metadataSource.dictAll().then(data => {
       console.info("后台返回数据字典:" + JSON.stringify(data))
       store.commit('account/setDictTypes', data)
     })
+    await metadataSource.channelAll().then(data => {
+      console.info("后台返回渠道字典:" + JSON.stringify(data))
+      store.commit('account/setChannelList', data)
+    })
   }
 }
-
 
 /**
  * 合并路由
@@ -352,4 +368,4 @@ function loadGuards(guards, options) {
   })
 }
 
-export {parseRoutes, resetRouter, loadRoutes, getI18nKey, loadGuards,loadUser,loadPermissions, loadAllDictTypes,deepMergeRoutes, formatRoutes}
+export {parseRoutes, resetRouter, loadRoutes, getI18nKey, loadGuards, loadLoginConfig, loadUser,loadPermissions, loadAllDictTypes,deepMergeRoutes, formatRoutes}

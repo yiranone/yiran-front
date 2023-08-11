@@ -6,28 +6,35 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+              <a-col class="auto" v-if="user.isAdmin">
+                  <a-form-item :label="$t('channelName')">
+                      <a-select placeholder="请选择" v-model="queryParam.channelId" allow-clear>
+                          <a-select-option v-for="(d, index) in this.channelList" :key="index" :value="d.channelId">{{ d.channelName }}</a-select-option>
+                      </a-select>
+                  </a-form-item>
+              </a-col>
+              <a-col class="auto">
               <a-form-item label="登录名">
                 <a-input v-model="queryParam.loginName" placeholder="" allow-clear/>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col class="auto">
               <a-form-item label="手机号">
                 <a-input v-model="queryParam.phoneNumber" placeholder="" allow-clear/>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item label="用户ID">
                   <a-input v-model="queryParam.userId" placeholder="" allow-clear/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item label="用户名称">
                   <a-input v-model="queryParam.userName" placeholder="" allow-clear/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item label="部门">
                   <a-tree-select
                       v-model="queryParam.deptId"
@@ -38,14 +45,14 @@
                       allowClear/>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item label="状态">
                   <a-select placeholder="请选择" v-model="queryParam.status" style="width: 100%" allow-clear>
                     <a-select-option v-for="(d, index) in this.$store.getters.system_user_status" :key="index" :value="d.value">{{ d.label }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24" v-if="hasPermission('system:role:view')">
+              <a-col class="auto" v-if="hasPermission('system:role:view')">
                 <a-form-item label="角色">
                   <a-select placeholder="请选择" v-model="queryParam.roleId" :filterOption="filterOption" :showSearch="true" style="width: 100%" allow-clear>
                     <a-select-option v-for="(d, index) in roleList" :key="index" :value="d.roleId"> {{ d.roleName }}</a-select-option>
@@ -53,8 +60,8 @@
                 </a-form-item>
               </a-col>
             </template>
-            <a-col :md="!advanced && 8 || 24" :sm="24">
-              <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
+            <a-col class="auto">
+              <span class="table-page-search-submitButtons">
                 <a-button type="primary" @click="handleQuery"><a-icon type="search" />查询</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />重置</a-button>
                 <a @click="toggleAdvanced" style="margin-left: 8px">
@@ -142,7 +149,7 @@
       <m-form ref="createForm" :deptOptions="deptOptions"
                 :statusOptions="statusOptions"
                 :sexOptions="sexOptions"
-                :channelOptions="channelOptions"
+                :channelOptions="channelList"
                 :roleList="roleList"
               @ok="getList"/>
       <reset-password ref="resetPasswordForm"/>
@@ -265,7 +272,6 @@
         columns: columns,
 
         // 状态数据字典
-        channelOptions: [],
         statusOptions: [],
         sexOptions: [],
         // 部门树选项
@@ -282,13 +288,13 @@
 
     created() {
       this.getRoleList()
-      this.getChannelList()
       this.getDeptTree()
       this.statusOptions = this.$store.getters.system_user_status
       this.getList()
     },
 
     computed: {
+        ...mapGetters(['user','channelList'])
     },
 
     filters: {
@@ -340,11 +346,6 @@
         } else {
           this.roleList = []
         }
-      },
-      getChannelList () {
-        ms.channelAll().then(data => {
-          this.channelOptions = data
-        })
       },
 
       getDeptTree () {

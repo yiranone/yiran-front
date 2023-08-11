@@ -34,4 +34,7 @@ module.exports = {
     delete_confirm_notice: 'Confirm Delete?',
     current_select_data: 'Current Select Data:',
 
+    channelId: 'ChannelID',
+    channelCode: 'Channel Code',
+    channelName: 'Channel Name',
 }

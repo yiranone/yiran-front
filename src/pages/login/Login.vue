@@ -2,8 +2,11 @@
   <common-layout>
     <div class="top">
       <div class="header">
+<!--
         <img alt="logo" class="logo" src="@/assets/img/logo.png"/>
-        <span class="title">{{systemName}}</span>
+-->
+          <img v-if="loginConfig.logo != null && loginConfig.logo != ''" alt="logo" class="logo" :src="loginConfig.logo"/>
+        <span class="title">{{loginConfig.displayName}}</span>
       </div>
       <div class="desc"></div>
     </div>
@@ -89,8 +92,8 @@
   import Verify from '@/components/verifition/Verify'
   import {userSource as us} from '@/services'
   import {setAuthorization} from '@/utils/request'
-  import {mapMutations, mapActions} from 'vuex'
-  import {loadRoutes, loadGuards, loadPermissions, loadAllDictTypes} from '@/utils/routerUtil'
+  import {mapMutations, mapActions, mapGetters} from 'vuex'
+  import {loadRoutes, loadGuards, loadPermissions, loadAllDictTypes} from '../../utils/routerUtil'
 
   export default {
     name: 'Login',
@@ -110,22 +113,25 @@
     },
     created() {
         //去服务器获取配置，当前是否配置了验证码登录校验
+      console.info("请求渠道配置，验证码，后台logo等等")
       us.loginConfig().then(data => {
         console.info("服务器配置" + JSON.stringify(data))
         this.captcha = data.captcha
+          this.setLoginConfig(data)
       })
     },
     computed: {
-      systemName() {
-        return this.$store.state.setting.systemName
-      }
+        ...mapGetters('account', ['loginConfig']),
+        systemName() {
+          return this.$store.state.setting.systemName
+        }
     },
 
     mounted() {
       // this.closeWebsocket()
     },
     methods: {
-      ...mapMutations('account', ['setUser', 'setPermissions', 'setRoles']),
+      ...mapMutations('account', ['setUser', 'setLoginConfig','setPermissions', 'setRoles']),
       // ...mapActions('account', ['getWebsocketInfo', 'closeWebsocket']),
       verifySuccess(d){
         console.info("验证码验证返回"+JSON.stringify(d))
@@ -160,14 +166,14 @@
                 .then(this.afterLogin)
                 .catch(err => {
                   if (err.msg) this.error = err.msg
+                  this.logging = false
                 })
-            this.logging = false
           } else {
             return false
           }
         })
       },
-      afterLogin(res) {
+      async afterLogin(res) {
         // const {user, permissions, roles} = res
         console.info("设置登录用户" + JSON.stringify(res))
         this.setUser(res)
@@ -177,14 +183,15 @@
         // this.setRoles(roles)
         setAuthorization({token: res.token})
         // 获取路由配置
-        this.$message.success('登录成功，欢迎回来', 3)
         console.info("加载路由配置")
-        loadRoutes({router: this.$router, store: this.$store, i18n: this.$i18n})
+        await loadAllDictTypes(this.$router,this.$store,this.$i18n)
         console.info("设置登录用户的权限")
-        loadPermissions(this.$router,this.$store,this.$i18n)
-        loadAllDictTypes(this.$router,this.$store,this.$i18n)
+        await loadPermissions(this.$router,this.$store,this.$i18n)
+        await loadRoutes({router: this.$router, store: this.$store, i18n: this.$i18n})
         // this.getWebsocketInfo()
-        this.$router.push('/home')
+        await this.$router.push('/home')
+        this.logging = false
+        this.$message.success('登录成功，欢迎回来', 5)
       }
     }
   }

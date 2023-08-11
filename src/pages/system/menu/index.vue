@@ -11,7 +11,7 @@
                 <a-input v-model="queryParam.menuName" placeholder="请输入菜单名称" allow-clear/>
               </a-form-item>
             </a-col>
-            <a-col :sm="6">
+            <a-col :md="8" :sm="24">
               <span class="table-page-search-submitButtons" style="float:right">
                 <a-button type="primary" @click="handleQuery"><a-icon type="search" />查询</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />重置</a-button>

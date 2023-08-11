@@ -37,8 +37,56 @@ body {
 //}
 // 数据列表 搜索条件
 .table-page-search-wrapper {
-
     .ant-form-inline {
+        .ant-col.auto {
+            float: left;
+            display: block;
+            position: relative;
+        }
+        @media (min-width: 768px) and (max-width: 575px) {
+            .ant-col.auto {
+                width: 100%;
+            }
+            .ant-col.twice {
+                width: 100%;
+            }
+        }
+        @media (min-width: 576px) and (max-width: 991px){
+            .ant-col.auto {
+                width: 50%;
+            }
+            .ant-col.twice {
+                width: 100%;
+            }
+        }
+        @media (min-width: 992px) and (max-width: 1199px){
+            .ant-col.auto {
+                width: 33.3333%;
+            }
+            .ant-col.twice {
+                width: 66.6666%;
+            }
+        }
+        @media (min-width: 1200px) and (max-width: 1599px){
+            .ant-col.auto {
+                width: 25%;
+            }
+            .ant-col.twice {
+                width: 50%;
+            }
+        }
+        @media (min-width: 1600px) {
+            .ant-col.auto {
+                width: 20%;
+            }
+            .ant-col.twice {
+                width: 40%;
+            }
+        }
+        .ant-col.auto:last-child {
+            float: right;
+        }
+
         .ant-form-item {
             display: flex;
             margin-bottom: 24px;
@@ -64,6 +112,8 @@ body {
 
     .table-page-search-submitButtons {
         display: block;
+        float: right;
+        overflow: hidden;
         margin-bottom: 24px;
         white-space: nowrap;
     }

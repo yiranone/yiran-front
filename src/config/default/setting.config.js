@@ -20,7 +20,7 @@ module.exports = {
   cachePage: true,                      //是否缓存页面数据，仅多页签模式下生效，true 缓存, false 不缓存
   hideSetting: false,                   //隐藏设置抽屉，true:隐藏，false:不隐藏
   hideFooter: false,                    //隐藏底部
-  systemName: '后台麻瓜',                //账户标识 登陆页面上方 菜单上方
+  systemName: '后台FIL',               //账户标识 登陆页面上方
   copyright: '2022 麻瓜后台',             //copyright
   asyncRoutes: true,                    //异步加载路由，true:开启，false:不开启
   showPageTitle: false,                  //是否显示页面标题（PageLayout 布局中的页面标题），true:显示，false:不显示

@@ -11,10 +11,13 @@ NProgress.configure({ showSpinner: false })
  * @param next
  */
 const progressStart = (to, from, next) => {
+  console.log('去往路由==>', to)
   // start progress bar
   if (!NProgress.isStarted()) {
     NProgress.start()
   }
+  console.info("from:"+from.path + JSON.stringify(from.meta) +" to:"+to.path + JSON.stringify(to.meta))
+ // debugger
   next()
 }
 

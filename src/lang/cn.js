@@ -36,4 +36,8 @@ module.exports = {
     can_not_blank: '不能为空',
     delete_confirm_notice: '确认删除吗?',
     current_select_data: '当前选中数据:',
+
+    channelId: '渠道ID',
+    channelCode: '渠道编码',
+    channelName: '渠道名称',
 }

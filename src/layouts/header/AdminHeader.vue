@@ -2,8 +2,11 @@
   <a-layout-header :class="[headerTheme, 'admin-header']">
     <div :class="['admin-header-wide', layout, pageWidth]">
       <router-link v-if="isMobile || layout === 'head'" to="/" :class="['logo', isMobile ? null : 'pc', headerTheme]">
+<!--
         <img width="32" src="@/assets/img/logo.png" />
-        <h1 v-if="!isMobile">{{systemName}}</h1>
+-->
+        <img v-if="loginConfig.logo != null" width="32" :src="loginConfig.logo" />
+        <h1 v-if="!isMobile">{{loginConfig.displayName}}</h1>
       </router-link>
       <a-divider v-if="isMobile" type="vertical" />
       <a-icon v-if="layout !== 'head'" class="trigger" :type="collapsed ? 'menu-unfold' : 'menu-fold'" @click="toggleCollapse"/>
@@ -38,7 +41,7 @@ import HeaderSearch from './HeaderSearch'
 import HeaderNotice from './HeaderNotice'
 import HeaderAvatar from './HeaderAvatar'
 import IMenu from '@/components/menu/menu'
-import {mapState, mapMutations} from 'vuex'
+import {mapState, mapMutations, mapGetters} from 'vuex'
 
 export default {
   name: 'AdminHeader',
@@ -49,13 +52,14 @@ export default {
       langList: [
         {key: 'CN', name: '简体中文', alias: '简体'},
         //{key: 'HK', name: '繁體中文', alias: '繁體'},
-        {key: 'US', name: 'English', alias: 'English'}
+        //{key: 'US', name: 'English', alias: 'English'}
       ],
       searchActive: false
     }
   },
   computed: {
-    ...mapState('setting', ['theme', 'isMobile', 'layout', 'systemName', 'lang', 'pageWidth']),
+      ...mapGetters('account', ['loginConfig']),
+      ...mapState('setting', ['theme', 'isMobile', 'layout', 'systemName', 'lang', 'pageWidth']),
     headerTheme () {
       if (this.layout == 'side' && this.theme.mode == 'dark' && !this.isMobile) {
         return 'light'
@@ -81,6 +85,7 @@ export default {
       this.$emit('menuSelect', obj)
     },
     ...mapMutations('setting', ['setLang'])
+
   }
 }
 </script>

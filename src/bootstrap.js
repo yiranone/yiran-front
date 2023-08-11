@@ -1,4 +1,4 @@
-import {loadRoutes, loadGuards, loadUser, loadPermissions, loadAllDictTypes} from '@/utils/routerUtil'
+import {loadRoutes, loadGuards, loadUser, loadPermissions, loadAllDictTypes, loadLoginConfig} from '@/utils/routerUtil'
 import {loadInterceptors} from '@/utils/request'
 import guards from '@/router/guards'
 import interceptors from '@/utils/axios-interceptors'
@@ -17,6 +17,8 @@ async function bootstrap({router, store, i18n, message}) {
   loadRoutes({router, store, i18n})
   // 加载路由守卫
   loadGuards(guards, {router, store, i18n, message})
+  //加载系统配置
+  loadLoginConfig(router,store,i18n)
   //加载当前登录用户信息
   loadUser(router,store,i18n)
   //加载当前登录用户权限

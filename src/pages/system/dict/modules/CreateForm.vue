@@ -44,13 +44,7 @@ export default {
       submitLoading: false,
       formTitle: '',
       // 表单参数
-      form: {
-        dictId: undefined,
-        dictName: undefined,
-        dictType: undefined,
-        status: '0',
-        remark: undefined
-      },
+      form: {},
       open: false,
       rules: {
         dictName: [{ required: true, message: '字典名称不能为空', trigger: 'blur' }],
@@ -81,7 +75,7 @@ export default {
         dictId: undefined,
         dictName: undefined,
         dictType: undefined,
-        status: '0',
+        status: '1',
         remark: undefined
       }
     },

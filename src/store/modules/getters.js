@@ -8,6 +8,7 @@ const getters = {
     user: state => state.account.user,
     permissions : state => state.account.permissions,
     dictTypes : state => state.account.dictTypes,
+    channelList : state => state.account.channelList,
     isMenuLoad : state => state.setting.isMenuLoad,
     lang : state => state.setting.lang,
     system_normal_disable: state => state.account.dictTypes.system_normal_disable,

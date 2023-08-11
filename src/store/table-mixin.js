@@ -9,11 +9,10 @@ const tableMixin = {
       advanced: false,
       pageNum: 1,
       pageSize: 10,
+      originPageSize : 10,
       pageSizeOptions: ['10','20','50','100','500'],
       lastName: '',
       queryParam: {
-        pageNum: 1,
-        pageSize: 10,
       },
       selectedRowKeys: [],
       selectedRows: [],
@@ -32,9 +31,14 @@ const tableMixin = {
           },
     }
   },
-
+  created() {
+    this.originPageSize = this.pageSize
+    this.queryParam.pageNum = this.pageNum
+    this.queryParam.pageSize = this.pageSize
+  },
   computed: {
     ...mapGetters('account', ['dictTypes']),
+    ...mapGetters(['user','channelList']),
     ...mapState({
       tableBordered: state => state.setting.tableBordered
     }),
@@ -48,6 +52,12 @@ const tableMixin = {
     // }
   },
   methods:{
+    setPageInfo(current, pageSize) {
+      this.queryParam.pageNum = current
+      this.queryParam.pageSize = pageSize
+      this.pageNum = current
+      this.pageSize = pageSize
+    },
     doGetData(){
       this.getList()
     },
@@ -65,9 +75,11 @@ const tableMixin = {
     /** 重置按钮操作 */
     resetQuery () {
       this.dateRange = []
+      this.pageNum = 1
+      this.pageSize = this.originPageSize,
       this.queryParam = {
-        pageNum: 1,
-        pageSize: this.pageSize,
+        pageNum: this.pageNum,
+        pageSize: this.originPageSize,
         orderByColumn: this.queryParam.orderByColumn,
         orderDirection: this.queryParam.orderDirection,
       }
@@ -78,32 +90,20 @@ const tableMixin = {
     },
     //每页展示数量改变
     onShowSizeChange (current, pageSize) {
-      this.queryParam.pageNum = current
-      this.queryParam.pageSize = pageSize
-      this.pageNum = current
-      this.pageSize = pageSize
+      this.setPageInfo(current,pageSize)
       this.doGetData()
     },
     onPageSizeChange (current, pageSize) {
-      this.queryParam.pageNum = current
-      this.queryParam.pageSize = pageSize
-      this.pageNum = current
-      this.pageSize = pageSize
+      this.setPageInfo(current,pageSize)
       this.doGetData()
     },
     //第几页改变
     changeSize (current, pageSize) {
-      this.queryParam.pageNum = current
-      this.queryParam.pageSize = pageSize
-      this.pageNum = current
-      this.pageSize = pageSize
+      this.setPageInfo(current,pageSize)
       this.doGetData()
     },
     onPageNumChange (current, pageSize) {
-      this.queryParam.pageNum = current
-      this.queryParam.pageSize = pageSize
-      this.pageNum = current
-      this.pageSize = pageSize
+      this.setPageInfo(current,pageSize)
       this.doGetData()
     },
     //排序改变

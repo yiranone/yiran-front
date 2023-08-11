@@ -7,25 +7,25 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+            <a-col class="auto">
               <a-form-item label="字典名称">
                 <a-input v-model="queryParam.dictName" placeholder="请输入字典名称" allow-clear/>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col class="auto">
               <a-form-item label="字典类型">
                 <a-input v-model="queryParam.dictType" placeholder="请选择字典类型" allow-clear/>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item label="状态">
                   <a-select placeholder="字典状态" v-model="queryParam.status" style="width: 100%">
                     <a-select-option v-for="(d, index) in statusOptions" :key="index" :value="d.value">{{ d.label }}</a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
-              <a-col :md="8" :sm="24">
+              <a-col class="auto twice">
                 <a-form-item label="创建时间">
                   <a-range-picker style="width: 100%" v-model="dateRange"
                                   :placeholder="['开始时间','结束时间']" :ranges='timeRange'
@@ -33,7 +33,7 @@
                 </a-form-item>
               </a-col>
             </template>
-            <a-col :md="!advanced && 8 || 24" :sm="24">
+            <a-col class="auto">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="handleQuery"><a-icon type="search" />查询</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />重置</a-button>
@@ -140,6 +140,7 @@ export default {
     return {
       list: [],
       total: 0,
+      pageSize:20,
       loading: false,
       // 状态数据字典
       statusOptions: [],

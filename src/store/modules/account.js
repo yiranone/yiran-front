@@ -4,9 +4,11 @@ export default {
   namespaced: true,
   state: {
     user: undefined,
+    loginConfig: undefined,
     permissions: null,
     roles: null,
     dictTypes: [],
+    channelList: [],
     routesConfig: null,
     innerAccountList: [],
     // websocket: new Websocket()
@@ -22,6 +24,17 @@ export default {
         }
       }
       return state.user
+    },
+    loginConfig: state => {
+      if (!state.loginConfig) {
+        try {
+          const loginConfig = localStorage.getItem(process.env.VUE_APP_LOGIN_CONFIG_KEY)
+          state.loginConfig = JSON.parse(loginConfig)
+        } catch (e) {
+          console.error(e)
+        }
+      }
+      return state.loginConfig
     },
     permissions: state => {
       // if (!state.permissions) {
@@ -46,6 +59,18 @@ export default {
         }
       }
       return state.dictTypes
+    },
+    channelList: state => {
+      if (!state.channelList) {
+        try {
+          const channelList = localStorage.getItem(process.env.VUE_APP_CHANNEL_LIST_KEY)
+          state.channelList = JSON.parse(channelList)
+          state.channelList = state.channelList ? state.channelList : []
+        } catch (e) {
+          console.error(e)
+        }
+      }
+      return state.channelList
     },
     roles: state => {
       if (!state.roles) {
@@ -77,6 +102,15 @@ export default {
       state.user = user
       localStorage.setItem(process.env.VUE_APP_USER_KEY, JSON.stringify(user || {}))
     },
+    setLoginConfig (state, loginConfig) {
+      state.loginConfig = loginConfig
+      var link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+      link.type = 'image/x-icon';
+      link.rel = 'shortcut icon';
+      link.href = loginConfig.icon;
+      document.getElementsByTagName('head')[0].appendChild(link);
+      localStorage.setItem(process.env.VUE_APP_LOGIN_CONFIG_KEY, JSON.stringify(loginConfig || {}))
+    },
     setAvatar (state, avatar) {
       state.user.avatar = avatar
       localStorage.setItem(process.env.VUE_APP_USER_KEY, JSON.stringify(state.user || {}))
@@ -96,6 +130,10 @@ export default {
     setDictTypes (state, dictTypes) {
       state.dictTypes = dictTypes
       localStorage.setItem(process.env.VUE_APP_DICT_TYPE_KEY, JSON.stringify(dictTypes || []))
+    },
+    setChannelList (state, channelList) {
+      state.channelList = channelList
+      localStorage.setItem(process.env.VUE_APP_CHANNEL_LIST_KEY, JSON.stringify(channelList || []))
     },
   },
   actions: {

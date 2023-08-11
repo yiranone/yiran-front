@@ -3,6 +3,7 @@
     <create-data-form
       ref="createDataForm"
       :statusOptions="statusOptions"
+      :is-default-options="isDefaultOptions"
       :dictType="dictType"
       @ok="getList"
     />
@@ -89,6 +90,7 @@ export default {
       loading: false,
       // 状态数据字典
       statusOptions: [],
+      isDefaultOptions: [],
       columns: [
         {
           title: '字典编码',
@@ -147,6 +149,7 @@ export default {
     this.queryParam.dictId = this.dictId
     this.getList()
     this.statusOptions=this.$store.getters.dictTypes.system_normal_disable
+      this.isDefaultOptions=[{"label":"默认","value":"Y"},{"label":"非默认","value":"N"}];
     // metadataSource.dictListByType('system_normal_disable').then(data => {
     //   this.statusOptions = data
     // })
