@@ -6,24 +6,31 @@
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
           <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+            <a-col class="auto" v-if="user.isAdmin">
+              <a-form-item :label="$t('channelName')">
+                <a-select placeholder="请选择" v-model="queryParam.channelId" allow-clear>
+                  <a-select-option v-for="(d, index) in this.channelList" :key="index" :value="d.channelId">{{ d.channelName }}</a-select-option>
+                </a-select>
+              </a-form-item>
+            </a-col>
+            <a-col class="auto">
               <a-form-item :label="$t('memberId')">
                 <a-input v-model="queryParam.memberId" placeholder="" allow-clear/>
               </a-form-item>
             </a-col>
-            <a-col :md="8" :sm="24">
+            <a-col class="auto">
               <a-form-item :label="$t('phone')">
                 <a-input v-model="queryParam.phone" placeholder="" allow-clear/>
               </a-form-item>
             </a-col>
             <template v-if="advanced">
-              <a-col :md="8" :sm="24">
+              <a-col class="auto">
                 <a-form-item :label="$t('name')">
                   <a-input v-model="queryParam.name" placeholder="" allow-clear/>
                 </a-form-item>
               </a-col>
             </template>
-            <a-col :md="!advanced && 8 || 24" :sm="24">
+            <a-col class="auto">
               <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
                 <a-button type="primary" @click="handleQuery"><a-icon type="search" />{{$t('query_button')}}</a-button>
                 <a-button style="margin-left: 8px" @click="resetQuery"><a-icon type="redo" />{{$t('reset_button')}}</a-button>
@@ -201,7 +208,12 @@
     created() {
       columns.map(column => {
         column.title = this.$t(column.key)
+        if(column.key == 'channelName'){
+            column.hidden = !this.user.isAdmin;
+        }
       })
+      this.queryParam.orderByColumn='memberId'
+      this.queryParam.orderDirection='DESC'
       this.getList()
     },
 
